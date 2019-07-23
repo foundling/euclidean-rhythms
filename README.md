@@ -1,29 +1,7 @@
 # euclidian_rhythms
 
-## Project setup
-```
-npm install
-```
+Experimenting with the Euclid's GCD algorithm in the realm of sequencing. 
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## References
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
++ [The Euclidian Algorithm Generates Traditional Musical Rhythms](http://cgm.cs.mcgill.ca/~godfried/publications/banff.pdf)
