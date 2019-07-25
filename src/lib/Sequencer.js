@@ -1,155 +1,63 @@
-/* ER algorithm */
-function ER(n, k, A) {
+import Tone from 'tone'
+import Scheduler from './Scheduler'
+import { requiredParam, range } from './utils'
 
-  function distribute(n, k, A) {
 
-    let numDistributions = Math.min(k, n - k)
-
-    for (let i = 0; i < numDistributions; i++) {
-      A[i] = [ A[i] + A.pop()[0] ]
+var synth = new Tone.MonoSynth({
+    "oscillator" : {
+        "type" : "sine"
+    },
+    "envelope" : {
+        "attack" : 0.1,
+        "decay" : 0.5,
+        "sustain" : 0.5,
+        "release" : 0.5,
     }
+}).toMaster();
 
-    return A
-  }
+export default class Sequencer {
 
-  if ((n - k) <= 1)
-    return A.join('')
-
-  return ER(
-    n - Math.min(k, n-k), 
-    k > (n - k) ? n % k : k % n,
-    distribute(n, k, A)
-  )
-
-}
-
-function range(n) {
-  return [...Array(n).keys()].map(Number)
-}
-/* Sequencer Classes */
-
-class RequiredParam extends Error {}
-
-const requiredParam = (name) => {
-  throw new TypeError(`${name} is a required parameter`)
-}
-
-class Note {
-
-  constructor({ 
-
-    audioContext = requiredParam('audioContext'), 
-    destNode = requiredParam('destNode'), 
-    frequency = 440, 
-    type = 'sine',
-
-  }) {
-
-    this.audioContext = audioContext
-    this.destNode = destNode
-    this.frequency = frequency 
-    this.type = type
-    this.osc = null
-
-  }
-
-  play() {
-
-    this.osc = this.audioContext.createOscillator() 
-    this.osc.frequency.value = this.frequency
-    this.osc.type = this.type
-    this.osc.connect(this.destNode)
-    this.osc.start()
-  }
-
-  stop() {
-    this.osc.stop()
-  }
-
-}
-
-const DIRECTION = {
-  CLOCKWISE: 'CLOCKWISE',
-  COUNTER_CLOCKWISE: 'COUNTER_CLOCKWISE'
-}
-
-class Sequencer {
-
-  constructor({ 
-
-    audioContext = requiredParam('audioContext'),
-    pulseCount = 8, 
-    stepCount = 16, 
-    stepsRotated = 0, 
-    tempo = 120, 
-    direction = DIRECTION.CLOCKWISE,
-    volume = 0.09,
-
-  }) {
-
-    this.tempo = tempo    
-    this.volume = volume
-    this.direction = direction
-    this.pulseCount = pulseCount
-    this.stepCount = stepCount
-    this.stepsRotated = stepsRotated
-    this.audioContext = audioContext
-    this.masterGainNode = audioContext.createGain()
-    this.masterGainNode.connect(audioContext.destination)
-    this.masterGainNode.gain.value = this.clampVolume(this.volume)
-
-    this.steps = null
-
+  constructor({ tempo = 120, steps = 8, distributedPulses = {}, ui = {} }) {
+    this.tempo = tempo
+    this.steps = steps
+    this.transport = Tone.Transport
+    this.stopped = false
+    this.started = false
+    this.paused = false
+    this.ui = ui
+    this.distributedPulses = distributedPulses
   }
 
   init() {
 
-    this.steps = range(this.stepCount)
-      .map(_ => new Note({ 
-        frequency: 440, 
-        audioContext: this.audioContext, 
-        destNode: this.masterGainNode, 
-        type: 'sine'
-      }))
+    const steps = range(this.steps)
+    const pulses = this.distributedPulses
+    const subdivision = '4n'
+    const self = this
+
+    const sequence = new Tone.Sequence(function(time, step) {
+
+      // pulses not updating like they would in vue
+      if (pulses[step])
+        synth.triggerAttackRelease("C4","8n")
+
+      self.ui.activeStep = step
+
+    }, steps, "4n")
+
+    sequence.start(0)
 
   }
 
-  startSequence() {
+  start() {
+    this.transport.start()
   }
 
-  stopSequence() {
+  pause() {
+    this.transport.pause()
   }
-
-  clampVolume(v) {
-    return v > 0.5 ? 0.5 : v < 0 ? 0 : v
-  } 
-
-  setVolume(newVolume) {
-    this.volume  = this.clampVolume(newVolume)
+  stop() {
+    this.transport.stop()
+    this.ui.activeStep = 0 
   }
-
-  changeDirection() {
-    this.direction === DIRECTION.CLOCKWISE ? DIRECTION.COUNTER_CLOCKWISE : DIRECTION.CLOCKWISE
-  }
-
-  changeTempo(newTempo) {
-    this.tempo = newTempo
-  }
-
-  toggleChannel(channelNumber) {
-    this.channels[channelNumber] = !this.channels[channelNumber]
-  }
-
-  // +steps for right, -steps for left
-  // todo: reflect sequence
-  rotateSequence(steps) {
-    this.stepsRotated = (this.stepsRotated + direction) % this.stepCount
-  }
-
-  increasePulses(n) {
-    this.pulseCount = (this.pulseCount + n) % this.stepCount
-  }
-
 }
-
-export default Sequencer
