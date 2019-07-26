@@ -11,7 +11,7 @@
       <circle 
         v-for="(circle, index) in circles" 
         :id="`step-${index}`"
-        :class="{ 'active-step': index === ui.activeStep, 'pulse': circle.isPulse }"
+        :class="{ 'active-step': isActiveStep(index, ui.activeStep), 'pulse': circle.isPulse }"
         :cx="circle.cx" 
         :cy="circle.cy"
         :key="index"
@@ -74,6 +74,9 @@
       this.sequencer.init()
     },
     methods: {
+      isActiveStep(stepIndex, activeStep) {
+        return stepIndex === activeStep || stepIndex === 0 && activeStep === -1
+      },
       onTempoChange(newTempo) {
         this.tempo = parseInt(newTempo)
         this.sequencer.updateTempo(this.tempo)

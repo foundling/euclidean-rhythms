@@ -25,6 +25,7 @@ export default class Sequencer {
 
     this.tempo = tempo
     this.sequence = sequence
+    this.sequencer = null
     this.ui = ui
 
     this.transport = Tone.Transport
@@ -56,9 +57,6 @@ export default class Sequencer {
   }
   updateTempo(newTempo) {
     this.transport.bpm.value = newTempo
-  }
-  updateSequence(newSequence) {
-    //this.transport.bpm.value = newTempo
   }
   start() {
     this.transport.start()
