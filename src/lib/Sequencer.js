@@ -68,6 +68,6 @@ export default class Sequencer {
   }
   stop() {
     this.transport.stop()
-    this.ui.activeStep = 0 
+    this.ui.activeStep = -1 
   }
 }
