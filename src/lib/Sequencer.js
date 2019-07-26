@@ -38,9 +38,6 @@ export default class Sequencer {
     let index = -1
     this.sequencer = new Tone.Sequence(function(time, isPulse) {
 
-      console.log({index})
-      console.log({ activeStep: self.ui.activeStep })
-
       if (isPulse) {
         synth.triggerAttackRelease("C4", '8n')
       }
@@ -55,7 +52,10 @@ export default class Sequencer {
 
 
   }
+  updateSequence(newSequence) {
+  }
   updateTempo(newTempo) {
+    console.log(newTempo)
     this.transport.bpm.value = newTempo
   }
   start() {

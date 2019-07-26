@@ -23,9 +23,7 @@
     <button @click="stopSequence" class="fas fa-stop">Stop</button>
     <button @click="pauseSequence" class="fas fa-pause">Pause</button>
 
-    <TempoControl 
-      v-on:tempo-change="onTempoChange" 
-      :initial-tempo="tempo" />
+    <TempoControl v-on:tempo-change="updateTempo" :initial-tempo="tempo" />
 
   </div>
 </template>
@@ -74,12 +72,11 @@
       this.sequencer.init()
     },
     methods: {
+      updateTempo(newTempo) {
+        this.tempo = parseInt(newTempo)
+      },
       isActiveStep(stepIndex, activeStep) {
         return stepIndex === activeStep || stepIndex === 0 && activeStep === -1
-      },
-      onTempoChange(newTempo) {
-        this.tempo = parseInt(newTempo)
-        this.sequencer.updateTempo(this.tempo)
       },
       distributePulses: ER,
       addPulse() {
@@ -96,7 +93,15 @@
       pauseSequence() {
         if (this.sequencer.state !== 'paused')
           this.sequencer.pause()
+      }
+    },
+    watch: {
+      sequence: function(newSeq, oldSeq) {
+        this.sequencer.updateSequence(newSeq)
       },
+      tempo: function(newTempo) {
+        this.sequencer.updateTempo(parseInt(newTempo))
+      }
     },
     computed: {
       sequence() {
