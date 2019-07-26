@@ -23,7 +23,11 @@
     <button @click="stopSequence" class="fas fa-stop">Stop</button>
     <button @click="pauseSequence" class="fas fa-pause">Pause</button>
 
-    <TempoControl v-on:tempo-change="updateTempo" :initial-tempo="tempo" />
+    <TempoControl 
+      v-on:tempo-change="updateTempo" 
+      :initial-tempo="tempo" />
+
+    <SourceEditor />
 
   </div>
 </template>
@@ -34,11 +38,13 @@
   import { degreesToRadians, ER, initSequence } from '../lib/equations'
   import Sequencer from '../lib/Sequencer'
   import TempoControl from './TempoControl'
+  import SourceEditor from './SourceEditor'
 
   export default {
     name: 'Sequencer',
     components: {
-      TempoControl
+      TempoControl,
+      SourceEditor
     },
     props: {
       pulses: {
