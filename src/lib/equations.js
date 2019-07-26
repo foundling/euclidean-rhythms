@@ -1,3 +1,4 @@
+import { range } from './utils'
 export const degreesToRadians = d => (d * Math.PI)/180
 
 /* ER algorithm */
@@ -14,8 +15,9 @@ export function ER(n, k, A) {
     return A
   }
 
-  if ((n - k) <= 1)
-    return A.join('')
+  if ((n - k) <= 1) {
+    return A.join('').split('').map(Number)
+  }
 
   return ER(
     n - Math.min(k, n-k), 
@@ -24,3 +26,10 @@ export function ER(n, k, A) {
   )
 
 }
+
+
+export const initSequence = (n, k) => ([
+  ...range(k).map(_ => '1'),
+  ...range(n - k).map(_ => '0')
+].join('').split(''))
+

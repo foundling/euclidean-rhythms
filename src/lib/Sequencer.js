@@ -2,7 +2,6 @@ import Tone from 'tone'
 import Scheduler from './Scheduler'
 import { requiredParam, range } from './utils'
 
-
 var synth = new Tone.MonoSynth({
     "oscillator" : {
         "type" : "sine"
@@ -16,7 +15,6 @@ var synth = new Tone.MonoSynth({
 }).toMaster();
 
 export default class Sequencer {
-
   constructor({ tempo = 120, steps = 8, distributedPulses = {}, ui = {} }) {
     this.tempo = tempo
     this.steps = steps
@@ -27,9 +25,9 @@ export default class Sequencer {
     this.ui = ui
     this.distributedPulses = distributedPulses
   }
-
   init() {
 
+    this.transport.bpm.value = this.tempo
     const steps = range(this.steps)
     const pulses = this.distributedPulses
     const subdivision = '4n'
@@ -37,7 +35,6 @@ export default class Sequencer {
 
     const sequence = new Tone.Sequence(function(time, step) {
 
-      // pulses not updating like they would in vue
       if (pulses[step])
         synth.triggerAttackRelease("C4","8n")
 
@@ -48,11 +45,12 @@ export default class Sequencer {
     sequence.start(0)
 
   }
-
+  updateTempo(newTempo) {
+    this.transport.bpm.value = newTempo
+  }
   start() {
     this.transport.start()
   }
-
   pause() {
     this.transport.pause()
   }

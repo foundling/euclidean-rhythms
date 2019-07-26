@@ -1,7 +1,10 @@
 <template>
 
   <div id="app">
-    <Sequencer :steps="8" />
+    <Sequencer 
+      :initial-tempo="140"
+      :steps="8" 
+      :pulses="3" />
   </div>
 
 </template>
@@ -11,9 +14,7 @@
 
   export default {
     name: 'app',
-    components: {
-      Sequencer
-    }
+    components: { Sequencer }
   }
 
 </script>
