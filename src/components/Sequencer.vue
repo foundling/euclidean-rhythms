@@ -22,7 +22,9 @@
     <button @click="stopSequence" class="fas fa-stop">Stop</button>
     <button @click="pauseSequence" class="fas fa-pause">Pause</button>
 
-    <TempoControl v-on:tempo-change="onTempoChange" :initial-tempo="tempo" />
+    <TempoControl 
+      v-on:tempo-change="onTempoChange" 
+      :initial-tempo="tempo" />
 
   </div>
 </template>
@@ -63,10 +65,10 @@
     },
     created() {
       this.sequencer = new Sequencer({
-        tempo: this.tempo,
         audioContext: new (window.AudioContext || AudioContext), 
+        tempo: this.tempo,
+        sequence: this.sequence,
         ui: this.ui,
-        sequence: this.sequence
       })
       this.sequencer.init()
     },

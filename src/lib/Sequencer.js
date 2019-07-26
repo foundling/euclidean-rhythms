@@ -2,51 +2,46 @@ import Tone from 'tone'
 import Scheduler from './Scheduler'
 import { requiredParam, range } from './utils'
 
-var synth = new Tone.MonoSynth({
-    "oscillator" : {
-        "type" : "sine"
-    },
-    "envelope" : {
-        "attack" : 0.1,
-        "decay" : 0.5,
-        "sustain" : 0.5,
-        "release" : 0.5,
-    }
-}).toMaster();
+var synth = new Tone.MonoSynth().toMaster();
 
 export default class Sequencer {
-  constructor({ tempo = 120, steps = 8, distributedPulses = {}, ui = {} }) {
+  constructor({ 
+    tempo = requiredParam('tempo'),
+    sequence = requiredParam('sequence'),
+    ui = {}
+  }) {
+
     this.tempo = tempo
-    this.steps = steps
-    this.transport = Tone.Transport
-    this.stopped = false
-    this.started = false
-    this.paused = false
+    this.sequence = sequence
     this.ui = ui
-    this.distributedPulses = distributedPulses
+
+    this.transport = Tone.Transport
+    this.transport.bpm.value = this.tempo
+
   }
   init() {
 
-    this.transport.bpm.value = this.tempo
-    const steps = range(this.steps)
-    const pulses = this.distributedPulses
     const subdivision = '4n'
     const self = this
 
-    const sequence = new Tone.Sequence(function(time, step) {
+    this.sequencer = new Tone.Sequence(function(time, pulseIndex) {
 
-      if (pulses[step])
+      if (self.sequence[pulseIndex]) {
         synth.triggerAttackRelease("C4","8n")
+      }
 
-      self.ui.activeStep = step
+      self.ui.activeStep = (self.ui.activeStep + 1) % self.sequence.length
 
-    }, steps, "4n")
+    }, range(this.sequence.length), "4n")
 
-    sequence.start(0)
+    this.sequencer.start(0)
 
   }
   updateTempo(newTempo) {
     this.transport.bpm.value = newTempo
+  }
+  updateSequence(newSequence) {
+    //this.transport.bpm.value = newTempo
   }
   start() {
     this.transport.start()
