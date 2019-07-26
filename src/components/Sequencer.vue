@@ -10,6 +10,7 @@
       </circle>
       <circle 
         v-for="(circle, index) in circles" 
+        :id="`step-${index}`"
         :class="{ 'active-step': index === ui.activeStep, 'pulse': circle.isPulse }"
         :cx="circle.cx" 
         :cy="circle.cy"
@@ -56,7 +57,7 @@
     data: function() {
       return {
         ui: { 
-          activeStep: 0 
+          activeStep: -1 
         },
         tempo: this.initialTempo,
         n: this.steps,

@@ -2,7 +2,7 @@
 
   <div id="app">
     <Sequencer 
-      :initial-tempo="140"
+      :initial-tempo="100"
       :steps="8" 
       :pulses="3" />
   </div>

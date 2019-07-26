@@ -2,13 +2,25 @@ import Tone from 'tone'
 import Scheduler from './Scheduler'
 import { requiredParam, range } from './utils'
 
-var synth = new Tone.MonoSynth().toMaster();
+const synth = new Tone.MonoSynth({
+  frequency: 'C4',
+  oscillator: {
+    type: 'sine'
+  },
+  envelope: {
+    attack: 0.005,
+    decay: 0.1,
+    sustain: 0.9,
+    release: 1
+  }
+}).toMaster();
+
 
 export default class Sequencer {
   constructor({ 
     tempo = requiredParam('tempo'),
     sequence = requiredParam('sequence'),
-    ui = {}
+    ui = { activeStep: 0 }
   }) {
 
     this.tempo = tempo
@@ -21,20 +33,25 @@ export default class Sequencer {
   }
   init() {
 
-    const subdivision = '4n'
     const self = this
+    let index = -1
+    this.sequencer = new Tone.Sequence(function(time, isPulse) {
 
-    this.sequencer = new Tone.Sequence(function(time, pulseIndex) {
+      console.log({index})
+      console.log({ activeStep: self.ui.activeStep })
 
-      if (self.sequence[pulseIndex]) {
-        synth.triggerAttackRelease("C4","8n")
+      if (isPulse) {
+        synth.triggerAttackRelease("C4", '8n')
       }
 
-      self.ui.activeStep = (self.ui.activeStep + 1) % self.sequence.length
+      Tone.Draw.schedule(function() {
+        self.ui.activeStep = (self.ui.activeStep + 1) % self.sequence.length
+      }, time)
 
-    }, range(this.sequence.length), "4n")
+      index = (index + 1) % self.sequence.length
 
-    this.sequencer.start(0)
+    }, this.sequence, "8n").start(0)
+
 
   }
   updateTempo(newTempo) {
