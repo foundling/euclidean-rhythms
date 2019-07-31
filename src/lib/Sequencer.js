@@ -3,15 +3,15 @@ import Scheduler from './Scheduler'
 import { requiredParam, range } from './utils'
 
 const synth = new Tone.MonoSynth({
-  frequency: 'C4',
+  frequency: 'G0',
   oscillator: {
     type: 'sine'
   },
   envelope: {
-    attack: 0.005,
+    attack: 0.1,
     decay: 0.1,
-    sustain: 0.9,
-    release: 1
+    sustain: 0.2,
+    release: 0.1
   }
 }).toMaster();
 
@@ -39,7 +39,7 @@ export default class Sequencer {
     this.sequencer = new Tone.Sequence(function(time, isPulse) {
 
       if (isPulse) {
-        synth.triggerAttackRelease("C4", '8n')
+        synth.triggerAttackRelease("C3", '16n')
       }
 
       Tone.Draw.schedule(function() {

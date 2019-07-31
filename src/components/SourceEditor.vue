@@ -24,19 +24,15 @@
         class="param-wrapper"
         v-for="(param, paramName) in params.envelope">
           <input 
+          v-model.number="params.envelope[paramName].value"
           class="param"
           type="range" 
           :min="params.envelope[paramName].min" 
           :max="params.envelope[paramName].max" 
-          :step="0.01"
-          v-model.number="params.envelope[paramName].value"></input>
-        </div>
-
-        <div v-for="(param, paramName) in params.envelope">
+          :step="0.01" />
           <label class="param-label">{{ paramName[0].toUpperCase() }}</label>
           <label class="param-label">{{ param.value }}</label>
         </div>
-
       </div>
 
     </div>
@@ -94,8 +90,19 @@
       height: 200px;
       width: 200px;
 
+      .param-wrapper:nth-child(1) {
+        background: aqua;
+      }
+      .param-wrapper:nth-child(2) {
+        background: yellow;
+      }
+      .param-wrapper:nth-child(3) {
+        background: lightgray;
+      }
+      .param-wrapper:nth-child(4) {
+        background: coral;
+      }
       .param-wrapper {
-        width: 25%;
         display: flex;
         flex-direction: column;
         height: 200px;
@@ -105,8 +112,6 @@
           width: fit-content;
           height: 50px;
           margin: 0;
-          transform-origin: 100px 100px;
-          transform: rotate(-90deg);
         }
 
         .param-label {

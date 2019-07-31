@@ -10,8 +10,13 @@
       </circle>
       <circle 
         v-for="(circle, index) in circles" 
+        @click="setEditable(index)"
         :id="`step-${index}`"
-        :class="{ 'active-step': isActiveStep(index, ui.activeStep), 'pulse': circle.isPulse }"
+        :class="{ 
+          'editing': isEditable(index),
+          'active-step': isActiveStep(index, ui.activeStep),
+          'pulse': circle.isPulse 
+        }"
         :cx="circle.cx" 
         :cy="circle.cy"
         :key="index"
@@ -19,9 +24,11 @@
       </circle>
     </svg>
 
-    <button @click="startSequence" class="fas fa-play">Start</button>
-    <button @click="stopSequence" class="fas fa-stop">Stop</button>
-    <button @click="pauseSequence" class="fas fa-pause">Pause</button>
+    <div class="transport">
+      <button @click="startSequence" class="fas fa-play">Start</button>
+      <button @click="stopSequence" class="fas fa-stop">Stop</button>
+      <button @click="pauseSequence" class="fas fa-pause">Pause</button>
+    </div>
 
     <TempoControl 
       v-on:tempo-change="updateTempo" 
@@ -63,6 +70,7 @@
         ui: { 
           activeStep: -1 
         },
+        editIndex: null,
         tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
@@ -78,8 +86,14 @@
       this.sequencer.init()
     },
     methods: {
+      setEditable(index) {
+        this.editIndex = index
+      },
       updateTempo(newTempo) {
         this.tempo = parseInt(newTempo)
+      },
+      isEditable(index) {
+        return index === this.editIndex
       },
       isActiveStep(stepIndex, activeStep) {
         return stepIndex === activeStep || stepIndex === 0 && activeStep === -1
@@ -152,6 +166,10 @@
         stroke: black;
         fill: white;
 
+        &.editing {
+          stroke: red;
+          stroke-width: 3px;
+        }
         &.active-step {
           fill: coral;
           stroke: yellow;
