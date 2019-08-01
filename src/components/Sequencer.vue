@@ -35,7 +35,7 @@
 
     <Tempo v-on:tempo-change="updateTempo" :initial-tempo="tempo" />
 
-    <Source :active="sourceEditorEnabled" :source="stepData[editIndex]" />
+    <Source :active="sourceEditorEnabled" :source="sourceEditorSource" />
 
   </div>
 </template>
@@ -85,7 +85,7 @@
     },
     methods: {
       setEditable(index) {
-        this.editIndex = index
+        this.editIndex = (index === this.editIndex) ? null : index
       },
       updateTempo(newTempo) {
         this.tempo = parseInt(newTempo)
@@ -134,7 +134,7 @@
                this.stepData[this.editIndex] != null
       },
       sourceEditorSource() {
-        return this.stepData[this.editIndex]
+        return this.stepData[this.editIndex] || Synth.defaultSettings
       },
       sequence() {
         return this.distributePulses(this.n, this.k, initSequence(this.n, this.k))
