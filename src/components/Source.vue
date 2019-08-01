@@ -22,16 +22,16 @@
       <div class="params" 
         <div
         class="param-wrapper"
-        v-for="(param, paramName) in params.envelope">
+        v-for="(paramValue, paramName) in params.envelope">
           <input 
-          v-model.number="params.envelope[paramName].value"
+          v-model.number="params.envelope[paramName]"
           class="param"
           type="range" 
-          :min="params.envelope[paramName].min" 
-          :max="params.envelope[paramName].max" 
-          :step="0.01" />
+          min="0.0"
+          max="1.0"
+          step="0.01" />
           <label class="param-label">{{ paramName[0].toUpperCase() }}</label>
-          <label class="param-label">{{ param.value }}</label>
+          <label class="param-label">{{ paramValue }}</label>
         </div>
       </div>
 
@@ -42,38 +42,26 @@
 
 <script>
 
+  // stick to one goal here: editing pre-existing data, emitting updates
+
   export default {
     name: 'SourceEditor',
+    props: {
+      source: Object
+    },
     data: function() {
       return {
         soundSource: 'synthesizer',
         soundSources: ['synthesizer','audio'],
+        stepData: null, // Synth.defaultSettings
+        stepDataIndex: -1,
+        // source.settings instead
         params: {
           envelope: {
-            attack: {
-              value: 0.01,
-              min: 0.0,
-              max: 0.5,
-              step: 0.01,
-            },
-            decay: {
-              value: 0.01,
-              min: 0.0,
-              max: 0.5,
-              step: 0.01,
-            },
-            sustain: {
-              value: 0.01,
-              min: 0.0,
-              max: 0.5,
-              step: 0.01,
-            },
-            release: {
-              value: 0.01,
-              min: 0.0,
-              max: 0.5,
-              step: 0.01,
-            }
+            attack:   0.04,
+            decay:    0.01,
+            sustain:  0.01,
+            release:  0.01
           }
         }
       }
@@ -84,12 +72,9 @@
 
 <style lang="scss" scoped>
   .source-editor {
-
     .source-editor__synth-editor {
       display: flex;
-      height: 200px;
       width: 200px;
-
       .param-wrapper:nth-child(1) {
         background: aqua;
       }
@@ -105,20 +90,16 @@
       .param-wrapper {
         display: flex;
         flex-direction: column;
-        height: 200px;
-        padding: 0;
-
+        padding: 20px;
         .param {
           width: fit-content;
           height: 50px;
           margin: 0;
         }
-
         .param-label {
           display: block;
           text-align: center;
         }
-
       }
     }
   }

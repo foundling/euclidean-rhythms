@@ -1,5 +1,6 @@
 <template>
   <div class="tempo-control">
+    <label>Tempo: </label>
     <input 
       @input="onTempoChange"
       v-model="tempo"
@@ -37,5 +38,7 @@
 
 <style lang="scss" scoped>
   .tempo-control {
+    label {
+    }
   }
 </style>

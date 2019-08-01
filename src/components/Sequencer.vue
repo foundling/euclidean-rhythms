@@ -8,6 +8,8 @@
         cy="200"
         r="20">
       </circle>
+
+      <!-- turn this into a Step component and pass step source as a property. --> 
       <circle 
         v-for="(circle, index) in circles" 
         @click="setEditable(index)"
@@ -24,18 +26,18 @@
       </circle>
     </svg>
 
+    <!-- Think about what the transport does and make this into a Transport component -->
     <div class="transport">
       <button @click="startSequence" class="fas fa-play">Start</button>
       <button @click="stopSequence" class="fas fa-stop">Stop</button>
       <button @click="pauseSequence" class="fas fa-pause">Pause</button>
     </div>
 
-    <TempoControl 
-      v-on:tempo-change="updateTempo" 
-      :initial-tempo="tempo" />
+    <Tempo v-on:tempo-change="updateTempo" :initial-tempo="tempo" />
 
-    <SourceEditor />
+    <Source :active="editIndex >= 0" />
 
+    <pre>{{ JSON.stringify(stepData, null, 4) }}</pre>
   </div>
 </template>
 
@@ -44,15 +46,13 @@
   import { range } from '../lib/utils'
   import { degreesToRadians, ER, initSequence } from '../lib/equations'
   import Sequencer from '../lib/Sequencer'
-  import TempoControl from './TempoControl'
-  import SourceEditor from './SourceEditor'
+  import Synth from '../lib/Synth'
+  import Tempo from './Tempo'
+  import Source from './Source'
 
   export default {
     name: 'Sequencer',
-    components: {
-      TempoControl,
-      SourceEditor
-    },
+    components: { Tempo, Source },
     props: {
       pulses: {
         type: Number
@@ -63,17 +63,15 @@
       initialTempo: {
         type: Number
       }
-
     },
     data: function() {
       return {
-        ui: { 
-          activeStep: -1 
-        },
+        ui: { activeStep: -1 },
         editIndex: null,
         tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
+        stepData: null,
       }
     },
     created() {
@@ -84,6 +82,7 @@
         ui: this.ui,
       })
       this.sequencer.init()
+      this.stepData = this.calculateStepData(this.n, this.k, this.sequence)
     },
     methods: {
       setEditable(index) {
@@ -99,8 +98,14 @@
         return stepIndex === activeStep || stepIndex === 0 && activeStep === -1
       },
       distributePulses: ER,
+      calculateStepData(n, k, A=[]) {
+        return range(n).map((_, index) => {
+          return A[index] ? Object.assign(Synth.defaultSettings, { sourceType: 'synth' }) : null
+        })
+      },
       addPulse() {
-        this.k = (this.k + 1 > this.n ? 1 : this.k + 1)
+        this.k = (this.k + 1 > this.n ? 0 : this.k + 1)
+        this.stepData = this.calculateStepData(this.n, this.k, this.sequence)
       },
       startSequence() {
         if (this.sequencer.state !== 'started')
@@ -157,6 +162,11 @@
     height: 400px;
     background: lightgray;
 
+    .transport > button {
+      font-size: 2.3em;
+      border: none;
+    }
+
     svg {
       width: 100%; 
       height: 100%;
@@ -166,14 +176,14 @@
         stroke: black;
         fill: white;
 
-        &.editing {
-          stroke: red;
-          stroke-width: 3px;
-        }
         &.active-step {
           fill: coral;
           stroke: yellow;
           stroke-width: 3;
+        }
+        &.editing {
+          stroke: red;
+          stroke-width: 3px;
         }
         &.pulse {
           fill: aqua;

@@ -2,36 +2,40 @@ import Tone from 'tone'
 import Scheduler from './Scheduler'
 import { requiredParam, range } from './utils'
 
-const synth = new Tone.MonoSynth({
+const defaultSettings = {
   frequency: 'G0',
   oscillator: {
     type: 'sine'
   },
   envelope: {
-    attack: 0.1,
-    decay: 0.1,
-    sustain: 0.2,
-    release: 0.1
+    attack: 0.5,
+    decay: 0.3,
+    sustain: 2,
+    release: 0.5
   }
-}).toMaster();
+}
 
+const synth = new Tone.MonoSynth(defaultSettings).toMaster();
 
 export default class Sequencer {
+
   constructor({ 
+
     tempo = requiredParam('tempo'),
     sequence = requiredParam('sequence'),
     ui = { activeStep: 0 }
+
   }) {
 
     this.tempo = tempo
     this.sequence = sequence
     this.sequencer = null
     this.ui = ui
-
     this.transport = Tone.Transport
     this.transport.bpm.value = this.tempo
 
   }
+
   init() {
 
     const self = this
@@ -52,20 +56,26 @@ export default class Sequencer {
 
 
   }
+
   updateSequence(newSequence) {
   }
+
   updateTempo(newTempo) {
     console.log(newTempo)
     this.transport.bpm.value = newTempo
   }
+
   start() {
     this.transport.start()
   }
+
   pause() {
     this.transport.pause()
   }
+
   stop() {
     this.transport.stop()
     this.ui.activeStep = -1 
   }
+
 }
