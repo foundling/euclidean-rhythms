@@ -1,3 +1,44 @@
+<style lang="scss" scoped>
+  .source-editor {
+    .source-editor__synth-editor {
+      display: flex;
+      width: 200px;
+      .param-wrapper:nth-child(1) {
+        background: aqua;
+      }
+      .param-wrapper:nth-child(2) {
+        background: yellow;
+      }
+      .param-wrapper:nth-child(3) {
+        background: lightgray;
+      }
+      .param-wrapper:nth-child(4) {
+        background: coral;
+      }
+
+      &:not(.active) {
+        > .param-wrapper {
+          background: lightgray;
+          color: gray;
+        }
+      }
+      .param-wrapper {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        .param {
+          width: fit-content;
+          height: 50px;
+          margin: 0;
+        }
+        .param-label {
+          display: block;
+          text-align: center;
+        }
+      }
+    }
+  }
+</style>
 <template>
   <div class="source-editor">
     <div class="source-editor__sound-source-selector">
@@ -17,6 +58,7 @@
 
     <div 
     v-show="soundSource === 'synthesizer'"
+    :class="{'active': active }"
     class="source-editor__synth-editor">
 
       <div class="params" 
@@ -24,6 +66,7 @@
         class="param-wrapper"
         v-for="(paramValue, paramName) in params.envelope">
           <input 
+          :disabled="!active"
           v-model.number="params.envelope[paramName]"
           class="param"
           type="range" 
@@ -35,19 +78,26 @@
         </div>
       </div>
 
+      <pre>{{ JSON.stringify(source, null, 4) }}</pre>
     </div>
 
   </div>
 </template>
-
 <script>
 
   // stick to one goal here: editing pre-existing data, emitting updates
+  import Synth from '../lib/Synth'
 
   export default {
     name: 'SourceEditor',
     props: {
-      source: Object
+      active: {
+        type: Boolean,
+      },
+      source: {
+        type: Object,
+        default: function() { return Synth.defaultSettings },
+      }
     },
     data: function() {
       return {
@@ -70,37 +120,3 @@
 
 </script>
 
-<style lang="scss" scoped>
-  .source-editor {
-    .source-editor__synth-editor {
-      display: flex;
-      width: 200px;
-      .param-wrapper:nth-child(1) {
-        background: aqua;
-      }
-      .param-wrapper:nth-child(2) {
-        background: yellow;
-      }
-      .param-wrapper:nth-child(3) {
-        background: lightgray;
-      }
-      .param-wrapper:nth-child(4) {
-        background: coral;
-      }
-      .param-wrapper {
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
-        .param {
-          width: fit-content;
-          height: 50px;
-          margin: 0;
-        }
-        .param-label {
-          display: block;
-          text-align: center;
-        }
-      }
-    }
-  }
-</style>

@@ -58,10 +58,12 @@ export default class Sequencer {
   }
 
   updateSequence(newSequence) {
+    newSequence.forEach((v,i) => {
+      this.sequencer.at(i, v) 
+    })
   }
 
   updateTempo(newTempo) {
-    console.log(newTempo)
     this.transport.bpm.value = newTempo
   }
 

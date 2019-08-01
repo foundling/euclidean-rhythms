@@ -4,7 +4,7 @@
     <Sequencer 
       :initial-tempo="100"
       :steps="8"
-      :pulses="0" />
+      :pulses="3" />
   </div>
 
 </template>

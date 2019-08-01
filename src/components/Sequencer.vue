@@ -35,9 +35,8 @@
 
     <Tempo v-on:tempo-change="updateTempo" :initial-tempo="tempo" />
 
-    <Source :active="editIndex >= 0" />
+    <Source :active="sourceEditorEnabled" :source="stepData[editIndex]" />
 
-    <pre>{{ JSON.stringify(stepData, null, 4) }}</pre>
   </div>
 </template>
 
@@ -129,6 +128,14 @@
       }
     },
     computed: {
+      sourceEditorEnabled() {
+        return this.editIndex != null &&
+               this.editIndex >= 0    &&
+               this.stepData[this.editIndex] != null
+      },
+      sourceEditorSource() {
+        return this.stepData[this.editIndex]
+      },
       sequence() {
         return this.distributePulses(this.n, this.k, initSequence(this.n, this.k))
       },
