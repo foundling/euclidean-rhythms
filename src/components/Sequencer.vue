@@ -6,8 +6,7 @@
         class="center"
         cx="200"
         cy="200"
-        r="20">
-      </circle>
+        r="20" />
 
       <!-- turn this into a Step component and pass step source as a property. --> 
       <circle 
@@ -22,8 +21,7 @@
         :cx="circle.cx" 
         :cy="circle.cy"
         :key="index"
-        r="20"> 
-      </circle>
+        r="20" /> 
     </svg>
 
     <!-- Think about what the transport does and make this into a Transport component -->
@@ -33,9 +31,14 @@
       <button @click="pauseSequence" class="fas fa-pause">Pause</button>
     </div>
 
-    <Tempo v-on:tempo-change="updateTempo" :initial-tempo="tempo" />
+    <Tempo 
+    v-on:tempo-change="updateTempo" 
+    :initial-tempo="tempo" />
 
-    <Source :active="sourceEditorEnabled" :source="sourceEditorSource" />
+    <Source 
+    v-on:source-editor-param-change="onParamChange"
+    :active="sourceEditorEnabled" 
+    :source="sourceEditorSource" />
 
   </div>
 </template>
@@ -53,7 +56,7 @@
     name: 'Sequencer',
     components: { Tempo, Source },
     props: {
-      pulses: {
+    pulses: {
         type: Number
       },
       steps: {
@@ -66,24 +69,28 @@
     data: function() {
       return {
         ui: { activeStep: -1 },
-        editIndex: null,
+        editIndex: 0,
         tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
-        stepData: null,
+        stepData: null
       }
     },
     created() {
+      this.stepData = this.calculateStepData(this.n, this.k, this.sequence)
       this.sequencer = new Sequencer({
+        stepData: this.stepData,
         audioContext: new (window.AudioContext || AudioContext), 
         tempo: this.tempo,
         sequence: this.sequence,
         ui: this.ui,
       })
       this.sequencer.init()
-      this.stepData = this.calculateStepData(this.n, this.k, this.sequence)
     },
     methods: {
+      onParamChange(updates) {
+        this.sequencer.updateStep(updates, this.editIndex)
+      },
       setEditable(index) {
         this.editIndex = (index === this.editIndex) ? null : index
       },
@@ -192,6 +199,10 @@
           stroke: red;
           stroke-width: 3px;
         }
+        &.pulse.active-step {
+          fill: coral;
+        } 
+
         &.pulse {
           fill: aqua;
         }

@@ -61,24 +61,28 @@
     :class="{'active': active }"
     class="source-editor__synth-editor">
 
+      <label>Note:</label>
+      <select :disabled="!active" v-model="source.note">
+        <option v-for="note in source.scale">{{ note }}</option> 
+      </select>
+
       <div class="params" 
         <div
         class="param-wrapper"
-        v-for="(paramValue, paramName) in params.envelope">
+        v-for="(paramValue, paramName) in source.envelope">
           <input 
+          @input="onParamChange"
           :disabled="!active"
-          v-model.number="params.envelope[paramName]"
+          v-model.number="source.envelope[paramName]"
           class="param"
           type="range" 
-          min="0.0"
+          min="0.01"
           max="1.0"
           step="0.01" />
           <label class="param-label">{{ paramName[0].toUpperCase() }}</label>
           <label class="param-label">{{ paramValue }}</label>
         </div>
       </div>
-
-      <pre>{{ JSON.stringify(source, null, 4) }}</pre>
     </div>
 
   </div>
@@ -102,18 +106,12 @@
     data: function() {
       return {
         soundSource: 'synthesizer',
-        soundSources: ['synthesizer','audio'],
-        stepData: null, // Synth.defaultSettings
-        stepDataIndex: -1,
-        // source.settings instead
-        params: {
-          envelope: {
-            attack:   0.04,
-            decay:    0.01,
-            sustain:  0.01,
-            release:  0.01
-          }
-        }
+        soundSources: ['synthesizer','audio']
+      }
+    },
+    methods: {
+      onParamChange(e) {
+        this.$emit('source-editor-param-change', this.source)
       }
     }
   }

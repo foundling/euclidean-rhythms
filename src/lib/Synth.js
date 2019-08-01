@@ -1,13 +1,15 @@
+import { range } from './utils'
+
 export default class Synth {
-
-  constructor() {
-
-  }
 
   static get defaultSettings() {
 
     return {
-      frequency: 'C2',
+      scale: range(8).flatMap(octave =>
+        ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+          .flatMap(note => `${note}${octave}`)
+      ),
+      note: 'C2',
       oscillator: {
         type: 'sine'
       },
