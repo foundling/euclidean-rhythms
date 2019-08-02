@@ -46,6 +46,7 @@ export default class Sequencer {
 
       if (isPulse) {
 
+        console.log(self.sequence, self.StepData)
         const { note, envelope, oscillator } = self.stepData[self.stepIndex]
 
         //synth.setNote = note
@@ -74,10 +75,15 @@ export default class Sequencer {
     this.stepData[editIndex] = updatedStepData
   }
 
+  updateStepData(newStepData) {
+    this.stepData = newStepData
+  }
+
   updateSequence(newSequence) {
-    newSequence.forEach((v,i) => {
-      this.sequencer.at(i, v) 
-    })
+    this.sequence = newSequence
+    for (let i = 0; i < newSequence.length; ++i) {
+      this.sequencer.at(i, newSequence[i])
+    }
   }
 
   updateTempo(newTempo) {

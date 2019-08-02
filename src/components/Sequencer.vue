@@ -73,6 +73,7 @@
         tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
+        sequence: this.distributePulses(this.steps, this.pulses, initSequence(this.steps, this.pulses)),
         stepData: null
       }
     },
@@ -111,7 +112,10 @@
       },
       addPulse() {
         this.k = (this.k + 1 > this.n ? 0 : this.k + 1)
+        this.sequence = this.distributePulses(this.n, this.k, initSequence(this.n, this.k))
         this.stepData = this.calculateStepData(this.n, this.k, this.sequence)
+        this.sequencer.updateSequence(this.sequence)
+        this.sequencer.updateStepData(this.stepData)
       },
       startSequence() {
         if (this.sequencer.state !== 'started')
@@ -127,9 +131,6 @@
       }
     },
     watch: {
-      sequence: function(newSeq, oldSeq) {
-        this.sequencer.updateSequence(newSeq)
-      },
       tempo: function(newTempo) {
         this.sequencer.updateTempo(parseInt(newTempo))
       }
@@ -142,9 +143,6 @@
       },
       sourceEditorSource() {
         return this.stepData[this.editIndex] || Synth.defaultSettings
-      },
-      sequence() {
-        return this.distributePulses(this.n, this.k, initSequence(this.n, this.k))
       },
       circles() {
 

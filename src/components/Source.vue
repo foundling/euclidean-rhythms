@@ -2,6 +2,7 @@
   .source-editor {
     .source-editor__synth-editor {
       display: flex;
+      flex-direction: column;
       width: 200px;
       .param-wrapper:nth-child(1) {
         background: aqua;
@@ -22,18 +23,22 @@
           color: gray;
         }
       }
-      .param-wrapper {
+      .params {
         display: flex;
-        flex-direction: column;
-        padding: 20px;
-        .param {
-          width: fit-content;
-          height: 50px;
-          margin: 0;
-        }
-        .param-label {
-          display: block;
-          text-align: center;
+
+        .param-wrapper {
+          display: flex;
+          flex-direction: column;
+          padding: 20px;
+          .param {
+            width: fit-content;
+            height: 50px;
+            margin: 0;
+          }
+          .param-label {
+            display: block;
+            text-align: center;
+          }
         }
       }
     }
@@ -66,7 +71,7 @@
         <option v-for="note in source.scale">{{ note }}</option> 
       </select>
 
-      <div class="params" 
+      <div class="params"> 
         <div
         class="param-wrapper"
         v-for="(paramValue, paramName) in source.envelope">
