@@ -73,7 +73,7 @@
         tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
-        sequence: this.distributePulses(this.steps, this.pulses, initSequence(this.steps, this.pulses)),
+        sequence: this.setSequence(this.steps, this.pulses),
         stepData: null
       }
     },
@@ -89,6 +89,9 @@
       this.sequencer.init()
     },
     methods: {
+      setSequence(n, k) {
+        return this.distributePulses(n, k, initSequence(n, k))
+      },
       onParamChange(updates) {
         this.sequencer.updateStep(updates, this.editIndex)
       },

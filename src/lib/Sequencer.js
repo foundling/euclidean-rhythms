@@ -46,13 +46,12 @@ export default class Sequencer {
 
       if (isPulse) {
 
-        console.log(self.sequence, self.StepData)
         const { note, envelope, oscillator } = self.stepData[self.stepIndex]
 
         //synth.setNote = note
 
-        synth.envelope.attack = envelope.attack
-        synth.envelope.decay = envelope.decay
+        synth.envelope.attack =  envelope.attack
+        synth.envelope.decay  =  envelope.decay
         synth.envelope.sustain = envelope.sustain
         synth.envelope.release = envelope.release
 
@@ -69,6 +68,10 @@ export default class Sequencer {
     }, this.sequence, "8n").start(0)
 
 
+  }
+
+  updateEnvelope(env) {
+    
   }
 
   updateStep(updatedStepData, editIndex) {
@@ -100,7 +103,7 @@ export default class Sequencer {
 
   stop() {
     this.transport.stop()
-    this.ui.activeStep = this.stepIndex = -1 
+    this.ui.activeStep = this.stepIndex = 0
   }
 
 }
