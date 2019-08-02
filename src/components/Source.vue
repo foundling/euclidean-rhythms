@@ -68,7 +68,7 @@
 
       <label>Note:</label>
       <select :disabled="!active" v-model="source.note">
-        <option v-for="note in source.scale">{{ note }}</option> 
+        <option v-for="note in source.SCALE">{{ note }}</option> 
       </select>
 
       <div class="params"> 

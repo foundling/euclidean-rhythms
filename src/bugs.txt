@@ -1,0 +1,2 @@
+transport:
+ - pulse && active step get out of sync when stopping/pausing

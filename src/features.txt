@@ -3,6 +3,7 @@ sequencer:
   add/subtract a pulse
   random pulse count
   octave buttons
+  match pulse color with channel button color
 
 
 todo:

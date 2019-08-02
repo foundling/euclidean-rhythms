@@ -15,40 +15,42 @@ const defaultSettings = {
   }
 }
 
-const synth = new Tone.MonoSynth(defaultSettings).toMaster();
-
 export default class Sequencer {
 
   constructor({ 
 
     tempo = requiredParam('tempo'),
-    sequence = requiredParam('sequence'),
+    sequences = requiredParam('sequences'),
+    channelIndex = requiredParam('channelIndex'),
     stepData = requiredParam('stepData'),
     ui = { activeStep: 0 }
 
   }) {
 
-
     this.sequencer = null
-    this.sequence = sequence
+    this.sequences = sequences
     this.stepData = stepData
-    this.ui = ui
+    this.channelIndex = channelIndex
+    this.stepIndex = 0
+
     this.transport = Tone.Transport
     this.transport.bpm.value = tempo
-    this.stepIndex = 0
+
+    this.ui = ui
 
   }
 
   init() {
+
+    const synth = new Tone.MonoSynth(defaultSettings).toMaster();
 
     const self = this
     this.sequencer = new Tone.Sequence(function(time, isPulse) {
 
       if (isPulse) {
 
-        const { note, envelope, oscillator } = self.stepData[self.stepIndex]
-
-        //synth.setNote = note
+        const { note, envelope, oscillator } = self.stepData[this.channelIndex][self.stepIndex]
+          debugger
 
         synth.envelope.attack =  envelope.attack
         synth.envelope.decay  =  envelope.decay
@@ -60,12 +62,12 @@ export default class Sequencer {
       }
 
       Tone.Draw.schedule(function() {
-        self.ui.activeStep = (self.ui.activeStep + 1) % self.sequence.length
+        self.ui.activeStep = (self.ui.activeStep + 1) % self.sequences[self.channelIndex].length
       }, time)
 
-      self.stepIndex = (self.stepIndex + 1) % self.sequence.length
+      self.stepIndex = (self.stepIndex + 1) % self.sequences[self.channelIndex].length
 
-    }, this.sequence, "8n").start(0)
+    }, this.sequences[this.channelIndex], "8n").start(0)
 
 
   }
