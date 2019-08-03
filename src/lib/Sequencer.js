@@ -40,44 +40,28 @@ export default class Sequencer {
 
   init() {
 
-    const synth = new Tone.MonoSynth(defaultSettings).toMaster();
+    const polySynth = new Tone.PolySynth(4, Tone.Synth).toMaster();
     const { sequence, stepData } = this.tracks[this.trackIndex]
-
     const self = this
-
-
-    // need to rewrite:
-    // 1. 
-    // convert sequence passed into Sequence to a [0 .. n-1] range of step index
-    //
-    // 2.
-    // use current index (where isPulse is now) in callback to loop through all track.sequences
-    // for any that have a '1', loop through step data at each track at that index
-    // triggerAttackRelease for each with corresponding step data
 
     this.sequencer = new Tone.Sequence(function(time, stepIndex) {
 
-      console.log(stepIndex, time)
-      let pulsesAtStep = self.tracks
-        .map(({ sequence, stepData }) => sequence[stepIndex] ? stepData[stepIndex] : null) 
+      Tone.Draw.schedule(function() {
+        self.ui.activeStep = stepIndex
+        // use stepIndex instead, put before pulse
+        //self.ui.activeStep = (self.ui.activeStep + 1) % sequence.length
+      }, time)
+      let notesAtStep = self.tracks
+        .map(({ sequence, stepData }) => sequence[stepIndex] ? stepData[stepIndex].note : null) 
         .filter(Boolean)
 
-      pulsesAtStep.forEach(stepData => {
-        synth.envelope.attack = stepData.envelope.attack
-        synth.envelope.decay = stepData.envelope.decay
-        synth.envelope.sustain = stepData.envelope.sustain
-        synth.envelope.release = stepData.envelope.release
-        synth.triggerAttackRelease(stepData.note, '4n')
-      })
-
-      Tone.Draw.schedule(function() {
-        // use stepIndex instead, put before pulse
-        self.ui.activeStep = (self.ui.activeStep + 1) % sequence.length
-      }, time)
+      if (notesAtStep.length) {
+        polySynth.triggerAttackRelease(notesAtStep, '16n')
+      }
 
       self.stepIndex = (self.stepIndex + 1) % sequence.length
 
-    }, range(sequence.length), "4n").start(0)
+    }, range(sequence.length), "8n").start(0)
 
   }
 
@@ -88,11 +72,7 @@ export default class Sequencer {
   }
 
   updateSequence(trackIndex, newSequence) {
-    // ????
-    const { sequence } = this.tracks[trackIndex]
-    for (let i = 0; i < sequence.length; ++i) {
-      this.sequencer.at(i, newSequence[i])
-    }
+    this.tracks[trackIndex].sequence = newSequence
   }
 
   updateTempo(newTempo) {
