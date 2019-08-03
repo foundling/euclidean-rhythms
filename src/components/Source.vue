@@ -3,6 +3,9 @@
 
   .source-editor {
 
+    &:not(.active) {
+      visibility: hidden;
+    }
     opacity: 1;
     &:not(.active) {
       opacity: 0.5;
@@ -80,7 +83,7 @@
   <div class="source-editor" :class="{ active }">
     <div class="source-editor__sound-source-selector">
 
-      <!--
+      <!-- restore when audio files are supported
       <input 
       v-model="soundSource" 
       checked="true" 
@@ -98,13 +101,6 @@
     <div 
     v-show="soundSource === 'synthesizer'"
     class="source-editor__synth-editor">
-
-      <!--
-      <label>Note:</label>
-      <select :disabled="!active" v-model="source.note">
-        <option v-for="note in source.SCALE">{{ note }}</option> 
-      </select>
-      -->
 
       <ul class="notes">
         <li class="note-name" :title="note" v-for="note in source.SCALE.slice(0,12)">{{note}}</li>
