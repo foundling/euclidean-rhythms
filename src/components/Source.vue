@@ -1,9 +1,18 @@
 <style lang="scss" scoped>
   .source-editor {
+
+    opacity: 1;
+    &:not(.active) {
+      opacity: 0.5;
+    }
+
+    & > * {
+      width: 100%;
+    }
     .source-editor__synth-editor {
       display: flex;
       flex-direction: column;
-      width: 200px;
+
       .param-wrapper:nth-child(1) {
         background: aqua;
       }
@@ -17,21 +26,17 @@
         background: coral;
       }
 
-      &:not(.active) {
-        > .param-wrapper {
-          background: lightgray;
-          color: gray;
-        }
-      }
       .params {
         display: flex;
 
         .param-wrapper {
+          width: calc(100%/4);
           display: flex;
           flex-direction: column;
-          padding: 20px;
+          padding: 5px;
+
           .param {
-            width: fit-content;
+            width: 100%;
             height: 50px;
             margin: 0;
           }
@@ -45,9 +50,10 @@
   }
 </style>
 <template>
-  <div class="source-editor">
+  <div class="source-editor" :class="{ active }">
     <div class="source-editor__sound-source-selector">
 
+      <!--
       <input 
       v-model="soundSource" 
       checked="true" 
@@ -58,12 +64,12 @@
       v-model="soundSource" 
       value="audio" 
       type="radio">Audio File</input>
+      -->
 
     </div>
 
     <div 
     v-show="soundSource === 'synthesizer'"
-    :class="{'active': active }"
     class="source-editor__synth-editor">
 
       <label>Note:</label>

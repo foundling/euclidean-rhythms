@@ -2,12 +2,12 @@
   <div class="tempo-control">
     <label>Tempo: </label>
     <input 
+      class="tempo"
       @input="onTempoChange"
-      v-model="tempo"
-      type="range" 
+      v-model.number="tempo"
+      type="number" 
       min="1" 
       max="300" />
-    {{ tempo }}
   </div>
 </template>
 
@@ -29,8 +29,6 @@
       onTempoChange() {
         this.$emit('tempo-change', this.tempo)
       }
-    },
-    computed: {
     }
   }
 
@@ -38,7 +36,11 @@
 
 <style lang="scss" scoped>
   .tempo-control {
-    label {
+    input.tempo {
+      padding-left: 10px;
+      font-size: 2em; 
+      background: white;
+      font-family: monospace;
     }
   }
 </style>

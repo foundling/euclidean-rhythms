@@ -7,18 +7,12 @@
     width: 400px;
     height: 400px;
 
-    .transport > button {
-      font-size: 2.3em;
-      border: none;
-      width: calc(100%/3) - 10px;
-
-      background: transparent;
-        padding: 10px;
+    & > * {
+      width: 100%;
     }
-
     .sequencer {
 
-      background: lightgray;
+      background: whitesmoke;
       width: 100%; 
       height: 100%;
 
@@ -59,13 +53,11 @@
 </style>
 <template>
   <div class="container">
-<!-- Think about what the transport does and make this into a Transport component -->
-    <div class="transport">
-      <button @click="startSequence" class="fas fa-play"></button>
-      <button @click="stopSequence" class="fas fa-stop"></button>
-      <button @click="pauseSequence" class="fas fa-pause"></button>
-    </div>
 
+    <Transport 
+       v-on:tempo-change="updateTempo"
+       :sequencer="sequencer" 
+       :tempo="tempo" />
 
     <svg 
       class="sequencer"
@@ -101,10 +93,6 @@
     :track-count="trackCount" 
     v-on:track-selector-update="updateSelectedTrack" />
 
-    <Tempo 
-    v-on:tempo-change="updateTempo" 
-    :initial-tempo="tempo" />
-
     <Source 
     v-on:source-editor-param-change="onParamChange"
     :active="sourceEditorEnabled" 
@@ -122,12 +110,14 @@
   import Tempo from './Tempo'
   import Source from './Source'
   import TrackSelector from './TrackSelector'
+  import Transport from './Transport'
 
   export default {
     name: 'Sequencer',
     components: { 
       Tempo, 
       Source, 
+      Transport,
       TrackSelector 
     },
     props: {
@@ -166,6 +156,11 @@
       this.sequencer.init()
     },
     methods: {
+      updateTempo(newTempo) {
+        // listening twice to tempo change event. maybe an event bus?
+        //https://stackoverflow.com/questions/42615445/vuejs-2-0-emit-event-from-grand-child-to-his-grand-parent-component
+        this.tempo = newTempo
+      },
       initTracks(trackCount, n, k) {
         return range(trackCount).map(_ => {
           return {
@@ -192,9 +187,6 @@
       },
       setEditable(index) {
         this.stepEditIndex = (index === this.stepEditIndex) ? null : index
-      },
-      updateTempo(newTempo) {
-        this.tempo = parseInt(newTempo)
       },
       isEditable(index) {
         return index === this.stepEditIndex
@@ -237,9 +229,6 @@
     watch: {
       tempo: function(newTempo) {
         this.sequencer.updateTempo(parseInt(newTempo))
-      },
-      trackIndex: function(newTrackIndex) {
-
       }
     },
     computed: {

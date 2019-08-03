@@ -8,6 +8,13 @@
   </div>
 </template>
 
+<style>
+  html, body {
+    font-family: sans-serif;
+  }
+</style>
+
+
 <script>
 
   import Sequencer from './components/Sequencer.vue'
@@ -18,3 +25,4 @@
   }
 
 </script>
+
