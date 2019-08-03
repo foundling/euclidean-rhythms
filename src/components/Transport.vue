@@ -66,17 +66,27 @@
 <style lang="scss" scoped>
   .transport {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    justify-content: space-between;
 
     .playhead-controls {
 
-       button {
+      button {
         font-size: 2.3em;
         border: none;
         background: transparent;
         padding: 10px;
       }
+      button:first-child {
+        padding: 0px 10px;
+      }
+      button:last-child {
+        padding: 0px 10px;
+      }
 
+
+    }
+    .tempo-controls {
     }
 
   }

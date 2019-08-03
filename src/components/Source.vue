@@ -1,4 +1,6 @@
 <style lang="scss" scoped>
+  @import "../assets/scss/colors.scss";
+
   .source-editor {
 
     opacity: 1;
@@ -13,23 +15,48 @@
       display: flex;
       flex-direction: column;
 
+
+      .notes {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-column-gap: 10px;
+        grid-row-gap: 10px;
+        margin: 0;
+        padding: 0;
+
+        .note {
+          list-style-type: none;
+          border-radius: 20px;
+          background: lightblue;
+          padding: 10px;
+
+          &.selected {
+            background: salmon;
+          }
+        }
+        .note-name {
+          list-style-type: none;
+        }
+      }
       .param-wrapper:nth-child(1) {
-        background: aqua;
+        background: $track-1;
       }
       .param-wrapper:nth-child(2) {
-        background: yellow;
+        background: $track-2;
       }
       .param-wrapper:nth-child(3) {
-        background: lightgray;
+
+        background: $track-3;
       }
       .param-wrapper:nth-child(4) {
-        background: coral;
+        background: $track-4;
       }
 
       .params {
         display: flex;
 
         .param-wrapper {
+          padding: 5px;
           width: calc(100%/4);
           display: flex;
           flex-direction: column;
@@ -72,10 +99,27 @@
     v-show="soundSource === 'synthesizer'"
     class="source-editor__synth-editor">
 
+      <!--
       <label>Note:</label>
       <select :disabled="!active" v-model="source.note">
         <option v-for="note in source.SCALE">{{ note }}</option> 
       </select>
+      -->
+
+      <ul class="notes">
+        <li class="note-name" :title="note" v-for="note in source.SCALE.slice(0,12)">{{note}}</li>
+      </ul>
+
+      <ul class="notes">
+        <li 
+        v-for="note in source.SCALE"
+        @click="assignNote(note)"
+        :title="note"
+        :class="{
+          'selected': source.note === note
+        }"
+        class="note"></li>
+      </ul>
 
       <div class="params"> 
         <div
@@ -100,7 +144,6 @@
 </template>
 <script>
 
-  // stick to one goal here: editing pre-existing data, emitting updates
   import Synth from '../lib/Synth'
 
   export default {
@@ -121,6 +164,9 @@
       }
     },
     methods: {
+      assignNote(note) {
+        this.$emit('source-editor-note-assign', note)
+      },
       onParamChange(e) {
         this.$emit('source-editor-param-change', this.source)
       }

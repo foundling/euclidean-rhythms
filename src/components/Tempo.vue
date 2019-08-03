@@ -35,6 +35,7 @@
 
 <style lang="scss" scoped>
   .tempo-control {
+    padding: 10px;
     input.tempo {
       border: 1px solid black;
       text-align: right; // why align right to center it? 

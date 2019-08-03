@@ -1,4 +1,5 @@
 <style lang="scss" scoped>
+  @import "../assets/scss/colors.scss";
 
   .container {
 
@@ -7,12 +8,10 @@
     width: 400px;
     height: 400px;
 
-    & > * {
-      width: 100%;
-    }
-    .sequencer {
+    & > * { width: 100%; }
 
-      background: whitesmoke;
+    .sequencer {
+      background: $gray-medium;
       width: 100%; 
       height: 100%;
 
@@ -32,6 +31,21 @@
         &.pulse.active-step {
           fill: coral;
         } 
+        &.pulse.track-1 {
+          fill: $track-1;
+        }
+
+        &.pulse.track-2 {
+          fill: $track-2;
+        }
+
+        &.pulse.track-3 {
+          fill: $track-3;
+        }
+
+        &.pulse.track-4 {
+          fill: $track-4;
+        }
 
         &.pulse {
           fill: aqua;
@@ -78,9 +92,10 @@
         :class="{ 
           'editing': isEditable(index),
           'active-step': isActiveStep(index, ui.activeStep),
-          'pulse': circle.isPulse 
+          'pulse': circle.isPulse, 
+          ['track-' + (trackIndex + 1)]: true 
         }"
-        :cx="circle.cx" 
+        :cx="circle.cx"
         :cy="circle.cy"
         :key="index"
         r="20" /> 
@@ -93,6 +108,7 @@
     v-on:track-selector-update="updateSelectedTrack" />
 
     <Source 
+    v-on:source-editor-note-assign="updateStepNote"
     v-on:source-editor-param-change="updateStepData"
     :active="sourceEditorEnabled" 
     :source="sourceEditorSource" />
@@ -139,8 +155,8 @@
         k: this.pulses,
         trackIndex: 0,
         tracks: this.initTracks(this.trackCount, this.steps, this.pulses),
-        ui: { activeStep: -1 },
-        stepEditIndex: 0,
+        ui: { activeStep: null },
+        stepEditIndex: null,
         tempo: this.initialTempo,
       }
     },
@@ -181,6 +197,11 @@
       setSequence(n, k) {
         return ER(n, k)
       },
+      updateStepNote(newNote) {
+        const stepData = this.tracks[this.trackIndex].stepData[this.stepEditIndex] 
+        stepData.note = newNote
+        this.updateStepData(stepData)
+      },
       updateStepData(stepUpdate) {
         this.sequencer.updateStep(stepUpdate, this.trackIndex, this.stepEditIndex)
       },
@@ -191,7 +212,7 @@
         return index === this.stepEditIndex
       },
       isActiveStep(stepIndex, activeStep) {
-        return stepIndex === activeStep || stepIndex === 0 && activeStep === -1
+        return stepIndex === activeStep
       },
       calculateStepData(n, k, A) {
         return range(n).map((_, index) => {

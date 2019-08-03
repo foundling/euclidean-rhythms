@@ -1,7 +1,9 @@
 <style lang="scss" scoped>
 
+  @import "../assets/scss/colors.scss";
+
   .track-selector {
-    background: whitesmoke;
+    background: $gray-light;
     box-sizing: border-box;
     padding: 15px 0px;
     display: flex;
@@ -10,20 +12,28 @@
     justify-content: space-around;
 
     button.track  {
+      border: none;
       box-sizing: border-box;
       height: 80px;
       width: 80px; 
-      background: rgb(80,80,80);
+      background: $gray-dark;
       color: white;
       border-radius: 2px;
 
-      &.active {
-        border: 1px solid red;
-        background: lightgray;
-        color: gray;
+      &.active.track-1 {
+        background: $track-1;
       }
-      &:focus {
-        outline: none;
+      &.active.track-2 {
+        background: $track-2;
+      }
+      &.active.track-3 {
+        background: $track-3;
+      }
+      &.active.track-4 {
+        background: $track-4;
+      }
+      &.active {
+        color: gray;
       }
 
     }
@@ -38,6 +48,7 @@
       class="track"
       v-for="(v,i) in trackCount"
       :class="{
+        ['track-'+ v]: true,
         'active': isActiveTrack(i)
       }"
       @click="selectTrack(i)">{{ v }}</button>
