@@ -15,13 +15,8 @@
 
     .sequencer {
 
-      display: none;
       width: 100%; 
       height: 100%;
-
-      &.active {
-        display: initial;
-      }
 
       circle {
 
@@ -63,10 +58,6 @@
   <div class="container">
     <svg 
       class="sequencer"
-      v-for="(n, channelIndex) in channelCount"
-      :class="{
-        'active': channelIndex === channel, 
-      }"
       width="100%" 
       height="100%">
 
@@ -94,10 +85,10 @@
 
     </svg>
 
-    <ChannelSelector 
-    :channel="channel" 
-    :channel-count="channelCount" 
-    v-on:channel-selector-update="updateSequenceChannel" />
+    <TrackSelector 
+    :track-index="trackIndex" 
+    :track-count="trackCount" 
+    v-on:track-selector-update="updateSelectedTrack" />
 
     <!-- Think about what the transport does and make this into a Transport component -->
     <div class="transport">
@@ -121,23 +112,19 @@
 <script>
 
   import { range } from '../lib/utils'
-  import { 
-    ER, 
-    initSequence, 
-    degreesToRadians, 
-  } from '../lib/equations'
+  import { ER, degreesToRadians } from '../lib/equations'
   import Sequencer from '../lib/Sequencer'
   import Synth from '../lib/Synth'
   import Tempo from './Tempo'
   import Source from './Source'
-  import ChannelSelector from './ChannelSelector'
+  import TrackSelector from './TrackSelector'
 
   export default {
     name: 'Sequencer',
     components: { 
       Tempo, 
       Source, 
-      ChannelSelector 
+      TrackSelector 
     },
     props: {
       pulses: {
@@ -146,7 +133,7 @@
       steps: {
         type: Number
       },
-      channelCount: {
+      trackCount: {
         type: Number
       },
       initialTempo: {
@@ -160,39 +147,44 @@
         tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
-        sequences: this.setSequences(this.steps, this.pulses, this.channelCount),
-        stepData: null,
-        channel: 1
+        trackIndex: 0,
+        tracks: this.initTracks(this.trackCount, this.steps, this.pulses),
       }
     },
     created() {
       const self = this
-      this.stepData = range(this.channelCount).map(channelIndex => {
-        return self.calculateStepData(self.n, self.k, self.sequences[channelIndex])
-      })
+      // stepData
       this.sequencer = new Sequencer({
-        channelIndex: this.channel,
-        stepData: this.stepData,
-        sequences: this.sequences,
-        audioContext: new (window.AudioContext || AudioContext), 
         tempo: this.tempo,
         ui: this.ui,
+        audioContext: new (window.AudioContext || AudioContext), 
+        tracks: this.tracks,
+        trackIndex: this.trackIndex,
       })
       this.sequencer.init()
-      console.log(this.sequencer)
     },
     methods: {
-      updateSequenceChannel(newChannel) {
-        this.channel = newChannel
+      initTracks(trackCount, n, k) {
+        return range(trackCount).map(_ => {
+          return {
+            n,
+            k,
+            sequence: ER(n, k),
+            stepData: range(n).map(_ => Synth.defaultSettings)
+          }
+        })
+      },
+      updateSelectedTrack(newTrackIndex) {
+        this.trackIndex = newTrackIndex
       },
       setSequences(n, k, sequenceCount) {
         const self = this
         return range(sequenceCount).map(_ => {
-          return ER(n, k, initSequence(n, k))
+          return ER(n, k)
         })
       },
       setSequence(n, k) {
-        return ER(n, k, initSequence(n, k))
+        return ER(n, k)
       },
       onParamChange(stepUpdate) {
         this.sequencer.updateStep(stepUpdate, this.stepEditIndex)
@@ -215,14 +207,17 @@
         })
       },
       addPulse() {
+        // increases k for this track
+        // re-runs ER for n,k
 
-        this.k = (this.k + 1 > this.n ? 0 : this.k + 1)
+        const track = this.tracks[this.trackIndex] 
+        track.k = (track.k + 1 > track.n) ? 0 : track.k + 1
 
-        this.sequences[this.channel] = ER(this.n, this.k, initSequence(this.n, this.k))
-        this.stepData = this.calculateStepData(this.n, this.k, this.sequences[this.channel])
+        track.sequence = ER(track.n, track.k)
+        this.stepData = this.calculateStepData(track.n, track.k, track.sequence)
 
-        this.sequencer.updateSequence(this.sequences[this.channel])
-        this.sequencer.updateStepData(this.stepData)
+        this.sequencer.updateSequence(this.trackIndex, track.sequence)
+        //this.sequencer.updateStepData(trackIndex, track.stepData)
 
       },
       startSequence() {
@@ -241,32 +236,37 @@
     watch: {
       tempo: function(newTempo) {
         this.sequencer.updateTempo(parseInt(newTempo))
+      },
+      trackIndex: function(newTrackIndex) {
+
       }
     },
     computed: {
       sourceEditorEnabled() {
+        const track = this.tracks[this.trackIndex]
         return this.stepEditIndex != null &&
                this.stepEditIndex >= 0    &&
-               this.stepData[this.stepEditIndex] != null
+               Boolean(track.sequence[this.stepEditIndex])
       },
       sourceEditorSource() {
-        return this.stepData[this.channel] ? this.stepData[this.channel][this.stepEditIndex] : Synth.defaultSettings
+        return this.tracks[this.trackIndex].stepData[this.stepEditIndex]
+      },
+      sequence() {
+        return this.tracks[this.trackIndex].sequence
       },
       circles() {
 
         const radius = 160
         const offsetAngle = 90
         const centerCoords = { x: 200, y: 200 }
-        const sequence = this.sequences[this.channel]
-        console.log('updating ?', sequence)
-        const k = this.k // reactivity hack to get to update, fix this.
+        const radiansPerCircle = 360.0/this.n
+        const sequence = this.sequence
 
-        return range(this.n)
-          .map(step => (360/this.n) * step)
-          .map((angle, index) => ({
+        return sequence.map((_, index) => radiansPerCircle * index)
+          .map((radians, index) => ({
             isPulse: sequence[index],
-            cx: radius * Math.cos(degreesToRadians(angle - offsetAngle)) + centerCoords.x,
-            cy: radius * Math.sin(degreesToRadians(angle - offsetAngle)) + centerCoords.y
+            cx: radius * Math.cos(degreesToRadians(radians - offsetAngle)) + centerCoords.x,
+            cy: radius * Math.sin(degreesToRadians(radians - offsetAngle)) + centerCoords.y
           }))
 
       },

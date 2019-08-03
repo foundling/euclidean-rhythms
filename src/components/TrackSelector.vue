@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
 
-  .channel-selector {
+  .track-selector {
     background: whitesmoke;
     box-sizing: border-box;
     padding: 15px 0px;
@@ -9,7 +9,7 @@
     align-items: center;
     justify-content: space-around;
 
-    button.channel {
+    button.track  {
       box-sizing: border-box;
       height: 80px;
       width: 80px; 
@@ -33,49 +33,48 @@
 </style>
 
 <template>
-  <div class="channel-selector">
+  <div class="track-selector">
     <button 
-      class="channel"
+      class="track"
+      v-for="(v,i) in trackCount"
       :class="{
-        'active': isActiveChannel(index)
+        'active': isActiveTrack(i)
       }"
-      v-for="(v,index) in channelCount"
-      @click="selectChannel(index)">{{ v }}</button>
+      @click="selectTrack(i)">{{ v }}</button>
   </div>
 </template>
 
 <script>
 
   export default {
-    name: 'ChannelSelector',
+    name: 'TrackSelector',
     props: {
-      channelCount: {
+      trackCount: {
         type: Number
       },
-      channel: {
+      trackIndex: {
         type: Number
       }
     },
     data: function() {
       return {
-        channelIndex: this.channel
+        index: this.trackIndex
       }
     },
     methods: {
-      selectChannel(index) {
+      selectTrack(newTrackIndex) {
 
-        if (index === this.channelIndex)
+        if (newTrackIndex === this.index)
           return
 
-        this.channelIndex = index
-        this.$emit('channel-selector-update', this.channelIndex)
+        this.index = newTrackIndex 
+        this.$emit('track-selector-update', this.index)
 
       },
-      isActiveChannel(index) {
-        return index === this.channelIndex
+      isActiveTrack(index) {
+        return index === this.index
       }
     }
   }
 
 </script>
-

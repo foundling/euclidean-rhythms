@@ -12,7 +12,7 @@ export default class Synth {
 
     return {
       SCALE,
-      note: 'C2',
+      note: 'G4',
       oscillator: {
         type: 'sine'
       },

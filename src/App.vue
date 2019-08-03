@@ -1,14 +1,13 @@
 <template>
-
   <div id="app">
     <Sequencer 
-      :channel-count="4"
+      :track-count="4"
       :initial-tempo="100"
       :steps="8"
-      :pulses="4" />
+      :pulses="0" />
   </div>
-
 </template>
+
 <script>
 
   import Sequencer from './components/Sequencer.vue'

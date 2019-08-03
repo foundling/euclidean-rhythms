@@ -20,17 +20,15 @@ export default class Sequencer {
   constructor({ 
 
     tempo = requiredParam('tempo'),
-    sequences = requiredParam('sequences'),
-    channelIndex = requiredParam('channelIndex'),
-    stepData = requiredParam('stepData'),
+    tracks = requiredParam('tracks'),
+    trackIndex = requiredParam('trackIndex'),
     ui = { activeStep: 0 }
 
   }) {
 
     this.sequencer = null
-    this.sequences = sequences
-    this.stepData = stepData
-    this.channelIndex = channelIndex
+    this.tracks = tracks
+    this.trackIndex = trackIndex
     this.stepIndex = 0
 
     this.transport = Tone.Transport
@@ -43,50 +41,66 @@ export default class Sequencer {
   init() {
 
     const synth = new Tone.MonoSynth(defaultSettings).toMaster();
+    const { sequence, stepData } = this.tracks[this.trackIndex]
 
     const self = this
-    this.sequencer = new Tone.Sequence(function(time, isPulse) {
 
-      if (isPulse) {
 
-        const { note, envelope, oscillator } = self.stepData[this.channelIndex][self.stepIndex]
-          debugger
+    // need to rewrite:
+    // 1. 
+    // convert sequence passed into Sequence to a [0 .. n-1] range of step index
+    //
+    // 2.
+    // use current index (where isPulse is now) in callback to loop through all track.sequences
+    // for any that have a '1', loop through step data at each track at that index
+    // triggerAttackRelease for each with corresponding step data
 
-        synth.envelope.attack =  envelope.attack
-        synth.envelope.decay  =  envelope.decay
-        synth.envelope.sustain = envelope.sustain
-        synth.envelope.release = envelope.release
+    this.sequencer = new Tone.Sequence(function(time, stepIndex) {
 
-        synth.triggerAttackRelease(note, '16n')
+      console.log(stepIndex)
+      let pulsesAtStep = self.tracks
+        .map(({ sequence, stepData }) => sequence[stepIndex] ? stepData[stepIndex] : null) 
+        .filter(Boolean)
 
-      }
+      pulsesAtStep.forEach(stepData => {
+        synth.envelope.attack = stepData.envelope.attack
+        synth.envelope.decay = stepData.envelope.decay
+        synth.envelope.sustain = stepData.envelope.sustain
+        synth.envelope.release = stepData.envelope.release
+        synth.triggerAttackRelease(stepData.note, '16n')
+      })
 
       Tone.Draw.schedule(function() {
-        self.ui.activeStep = (self.ui.activeStep + 1) % self.sequences[self.channelIndex].length
+        // use stepIndex instead, put before pulse
+        self.ui.activeStep = (self.ui.activeStep + 1) % sequence.length
       }, time)
 
-      self.stepIndex = (self.stepIndex + 1) % self.sequences[self.channelIndex].length
+      self.stepIndex = (self.stepIndex + 1) % sequence.length
 
-    }, this.sequences[this.channelIndex], "8n").start(0)
-
+    }, range(sequence.length), "8n").start(0)
 
   }
+
+
 
   updateEnvelope(env) {
     
   }
 
   updateStep(updatedStepData, editIndex) {
+    // fix
     this.stepData[editIndex] = updatedStepData
   }
 
   updateStepData(newStepData) {
+    // fix
     this.stepData = newStepData
   }
 
-  updateSequence(newSequence) {
-    this.sequence = newSequence
-    for (let i = 0; i < newSequence.length; ++i) {
+  updateSequence(trackIndex, newSequence) {
+    // ????
+    const { sequence } = this.tracks[trackIndex]
+    for (let i = 0; i < sequence.length; ++i) {
       this.sequencer.at(i, newSequence[i])
     }
   }
