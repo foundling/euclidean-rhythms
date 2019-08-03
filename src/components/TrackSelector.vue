@@ -15,10 +15,10 @@
       width: 80px; 
       background: rgb(80,80,80);
       color: white;
-      border: none;
       border-radius: 2px;
 
       &.active {
+        border: 1px solid red;
         background: lightgray;
         color: gray;
       }

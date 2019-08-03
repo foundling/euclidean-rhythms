@@ -1,8 +1,7 @@
 <template>
   <div class="step-counter">
     <label>Steps: </label>
-    <input 
-      type="text"/>
+    <input type="text" />
     {{ tempo }}
   </div>
 </template>

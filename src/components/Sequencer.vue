@@ -6,21 +6,24 @@
     padding: 0;
     width: 400px;
     height: 400px;
-    background: lightgray;
 
     .transport > button {
       font-size: 2.3em;
       border: none;
+      width: calc(100%/3) - 10px;
+
+      background: transparent;
+        padding: 10px;
     }
 
     .sequencer {
 
+      background: lightgray;
       width: 100%; 
       height: 100%;
 
       circle {
 
-        stroke: black;
         fill: white;
 
         &.active-step {
@@ -56,11 +59,19 @@
 </style>
 <template>
   <div class="container">
+<!-- Think about what the transport does and make this into a Transport component -->
+    <div class="transport">
+      <button @click="startSequence" class="fas fa-play"></button>
+      <button @click="stopSequence" class="fas fa-stop"></button>
+      <button @click="pauseSequence" class="fas fa-pause"></button>
+    </div>
+
+
     <svg 
       class="sequencer"
       width="100%" 
       height="100%">
-
+    
       <circle
         @click="addPulse"
         class="center"
@@ -89,13 +100,6 @@
     :track-index="trackIndex" 
     :track-count="trackCount" 
     v-on:track-selector-update="updateSelectedTrack" />
-
-    <!-- Think about what the transport does and make this into a Transport component -->
-    <div class="transport">
-      <button @click="startSequence" class="fas fa-play">Start</button>
-      <button @click="stopSequence" class="fas fa-stop">Stop</button>
-      <button @click="pauseSequence" class="fas fa-pause">Pause</button>
-    </div>
 
     <Tempo 
     v-on:tempo-change="updateTempo" 
@@ -142,18 +146,16 @@
     },
     data: function() {
       return {
-        ui: { activeStep: -1 },
-        stepEditIndex: 0,
-        tempo: this.initialTempo,
         n: this.steps,
         k: this.pulses,
         trackIndex: 0,
         tracks: this.initTracks(this.trackCount, this.steps, this.pulses),
+        ui: { activeStep: -1 },
+        stepEditIndex: 0,
+        tempo: this.initialTempo,
       }
     },
     created() {
-      const self = this
-      // stepData
       this.sequencer = new Sequencer({
         tempo: this.tempo,
         ui: this.ui,
@@ -178,7 +180,6 @@
         this.trackIndex = newTrackIndex
       },
       setSequences(n, k, sequenceCount) {
-        const self = this
         return range(sequenceCount).map(_ => {
           return ER(n, k)
         })
