@@ -1,9 +1,10 @@
 sequencer:
-  reverse direction
-  add/subtract a pulse
-  random pulse count
+  solo/mute channel
+  reverse seq direction
+  manually add/subtract a pulse
+  random pulse distribution
   octave buttons
-  match pulse color with channel button color
+
 
 todo:
   color coded guide. choose colors friendly to people w/ colorblindness.
