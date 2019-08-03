@@ -71,7 +71,6 @@
         cy="200"
         r="20" />
 
-      <!-- turn this into a Step component and pass step source as a property. --> 
       <circle 
         v-for="(circle, index) in circles" 
         @click="setEditable(index)"
@@ -94,7 +93,7 @@
     v-on:track-selector-update="updateSelectedTrack" />
 
     <Source 
-    v-on:source-editor-param-change="onParamChange"
+    v-on:source-editor-param-change="updateStepData"
     :active="sourceEditorEnabled" 
     :source="sourceEditorSource" />
 
@@ -182,8 +181,8 @@
       setSequence(n, k) {
         return ER(n, k)
       },
-      onParamChange(stepUpdate) {
-        this.sequencer.updateStep(stepUpdate, this.stepEditIndex)
+      updateStepData(stepUpdate) {
+        this.sequencer.updateStep(stepUpdate, this.trackIndex, this.stepEditIndex)
       },
       setEditable(index) {
         this.stepEditIndex = (index === this.stepEditIndex) ? null : index
@@ -210,7 +209,6 @@
         this.stepData = this.calculateStepData(track.n, track.k, track.sequence)
 
         this.sequencer.updateSequence(this.trackIndex, track.sequence)
-        //this.sequencer.updateStepData(trackIndex, track.stepData)
 
       },
       startSequence() {

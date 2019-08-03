@@ -1,6 +1,5 @@
 <template>
   <div class="tempo-control">
-    <label>Tempo: </label>
     <input 
       class="tempo"
       @input="onTempoChange"
@@ -37,9 +36,11 @@
 <style lang="scss" scoped>
   .tempo-control {
     input.tempo {
-      padding-left: 10px;
+      border: 1px solid black;
+      text-align: right; // why align right to center it? 
       font-size: 2em; 
-      background: white;
+      color: white;
+      background: black;
       font-family: monospace;
     }
   }

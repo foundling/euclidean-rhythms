@@ -57,7 +57,7 @@ export default class Sequencer {
 
     this.sequencer = new Tone.Sequence(function(time, stepIndex) {
 
-      console.log(stepIndex)
+      console.log(stepIndex, time)
       let pulsesAtStep = self.tracks
         .map(({ sequence, stepData }) => sequence[stepIndex] ? stepData[stepIndex] : null) 
         .filter(Boolean)
@@ -67,7 +67,7 @@ export default class Sequencer {
         synth.envelope.decay = stepData.envelope.decay
         synth.envelope.sustain = stepData.envelope.sustain
         synth.envelope.release = stepData.envelope.release
-        synth.triggerAttackRelease(stepData.note, '16n')
+        synth.triggerAttackRelease(stepData.note, '4n')
       })
 
       Tone.Draw.schedule(function() {
@@ -77,24 +77,14 @@ export default class Sequencer {
 
       self.stepIndex = (self.stepIndex + 1) % sequence.length
 
-    }, range(sequence.length), "8n").start(0)
+    }, range(sequence.length), "4n").start(0)
 
   }
 
 
 
-  updateEnvelope(env) {
-    
-  }
-
-  updateStep(updatedStepData, editIndex) {
-    // fix
-    this.stepData[editIndex] = updatedStepData
-  }
-
-  updateStepData(newStepData) {
-    // fix
-    this.stepData = newStepData
+  updateStep(newStepData, trackIndex, stepEditIndex) {
+    this.tracks[trackIndex].stepData[stepEditIndex] = newStepData
   }
 
   updateSequence(trackIndex, newSequence) {

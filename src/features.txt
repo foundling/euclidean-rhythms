@@ -5,9 +5,7 @@ sequencer:
   octave buttons
   match pulse color with channel button color
 
-
 todo:
-   
   color coded guide. choose colors friendly to people w/ colorblindness.
   rename source/tempo to two word names, per Vue best practices
   fix ui color priorities so it's easier to use at first 
