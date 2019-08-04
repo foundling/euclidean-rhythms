@@ -1,9 +1,9 @@
 <template>
   <div class="tempo-control">
     <input 
-      class="tempo"
       @input="onTempoChange"
-      v-model.number="tempo"
+      v-model.number="tempo$"
+      class="tempo"
       type="number" 
       min="1" 
       max="300" />
@@ -15,18 +15,18 @@
   export default {
     name: 'TempoControl',
     props: {
-      initialTempo: {
+      tempo: {
         type: Number,
       } 
     },
     data: function() {
       return {
-        tempo: this.initialTempo
+        tempo$: this.tempo
       }
     },
     methods: {
       onTempoChange() {
-        this.$emit('tempo-change', this.tempo)
+        this.$emit('tempo-change', this.tempo$)
       }
     }
   }

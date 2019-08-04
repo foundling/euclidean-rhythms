@@ -1,119 +1,89 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors.scss";
 
-  .container {
+  .sequencer {
+    background: $gray-medium;
+    width: 100%; 
+    height: 100%;
 
-    margin: 0;
-    padding: 0;
-    width: 400px;
-    height: 400px;
+    circle {
 
-    & > * { width: 100%; }
+      fill: white;
 
-    .sequencer {
-      background: $gray-medium;
-      width: 100%; 
-      height: 100%;
+      &.active-step {
+        fill: coral;
+        stroke: yellow;
+        stroke-width: 3;
+      }
+      &.editing {
+        stroke: red;
+        stroke-width: 3px;
+      }
+      &.pulse.active-step {
+        fill: coral;
+      } 
+      &.pulse.track-1 {
+        fill: $track-1;
+      }
 
-      circle {
+      &.pulse.track-2 {
+        fill: $track-2;
+      }
 
-        fill: white;
+      &.pulse.track-3 {
+        fill: $track-3;
+      }
 
-        &.active-step {
-          fill: coral;
-          stroke: yellow;
-          stroke-width: 3;
-        }
-        &.editing {
-          stroke: red;
-          stroke-width: 3px;
-        }
-        &.pulse.active-step {
-          fill: coral;
-        } 
-        &.pulse.track-1 {
-          fill: $track-1;
-        }
+      &.pulse.track-4 {
+        fill: $track-4;
+      }
 
-        &.pulse.track-2 {
-          fill: $track-2;
-        }
-
-        &.pulse.track-3 {
-          fill: $track-3;
-        }
-
-        &.pulse.track-4 {
-          fill: $track-4;
-        }
-
-        &.pulse {
-          fill: aqua;
-        }
-        &.step {
-          fill: black;
-        }
-        &.center {
-          stroke: white;
-          stroke-width: 3;
-          fill: black;
-        }
-
+      &.pulse {
+        fill: aqua;
+      }
+      &.step {
+        fill: black;
+      }
+      &.center {
+        stroke: white;
+        stroke-width: 3;
+        fill: black;
       }
 
     }
 
   }
 </style>
+
 <template>
-  <div class="container">
+  <svg 
+    class="sequencer"
+    width="100%" 
+    height="100%">
+  
+    <circle
+      @click="addPulse"
+      class="center"
+      cx="200"
+      cy="200"
+      r="20" />
 
-    <Transport 
-       v-on:tempo-change="updateTempo"
-       :sequencer="sequencer" 
-       :tempo="tempo" />
+    <circle 
+      v-for="(circle, index) in circles" 
+      @click="setEditable(index)"
+      :id="`step-${index}`"
+      :class="{ 
+        'editing': isEditable(index),
+        'active-step': isActiveStep(index, ui.activeStep),
+        'pulse': circle.isPulse, 
+        ['track-' + (trackIndex + 1)]: true 
+      }"
+      :cx="circle.cx"
+      :cy="circle.cy"
+      :key="index"
+      r="20" /> 
 
-    <svg 
-      class="sequencer"
-      width="100%" 
-      height="100%">
-    
-      <circle
-        @click="addPulse"
-        class="center"
-        cx="200"
-        cy="200"
-        r="20" />
-
-      <circle 
-        v-for="(circle, index) in circles" 
-        @click="setEditable(index)"
-        :id="`step-${index}`"
-        :class="{ 
-          'editing': isEditable(index),
-          'active-step': isActiveStep(index, ui.activeStep),
-          'pulse': circle.isPulse, 
-          ['track-' + (trackIndex + 1)]: true 
-        }"
-        :cx="circle.cx"
-        :cy="circle.cy"
-        :key="index"
-        r="20" /> 
-
-    </svg>
-
-    <TrackSelector 
-    :track-index="trackIndex" 
-    :track-count="trackCount" 
-    v-on:track-selector-update="updateSelectedTrack" />
-
-    <Source 
-    v-on:source-editor-note-assign="updateStepNote"
-    v-on:source-editor-param-change="updateStepData"
-    :active="sourceEditorEnabled" 
-    :source="sourceEditorSource" />
-
-  </div>
+  </svg>
 </template>
 
 <script>
@@ -137,7 +107,7 @@
     },
     props: {
       pulses: {
-          type: Number
+        type: Number
       },
       steps: {
         type: Number
@@ -147,6 +117,12 @@
       },
       initialTempo: {
         type: Number
+      },
+      state: {
+        type: String,
+        validator(s) {
+          return ['started','stopped','paused'].includes(s)
+        }
       }
     },
     data: function() {
@@ -154,10 +130,10 @@
         n: this.steps,
         k: this.pulses,
         trackIndex: 0,
-        tracks: this.initTracks(this.trackCount, this.steps, this.pulses),
-        ui: { activeStep: null },
         stepEditIndex: null,
-        tempo: this.initialTempo,
+        ui: { 
+          activeStep: null 
+        }
       }
     },
     created() {
@@ -178,16 +154,6 @@
         */
         this.tempo = newTempo
       },
-      initTracks(trackCount, n, k) {
-        return range(trackCount).map(_ => {
-          return {
-            n,
-            k,
-            sequence: ER(n, k),
-            stepData: range(n).map(_ => Synth.defaultSettings)
-          }
-        })
-      },
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex
       },
@@ -198,14 +164,6 @@
       },
       setSequence(n, k) {
         return ER(n, k)
-      },
-      updateStepNote(newNote) {
-        const stepData = this.tracks[this.trackIndex].stepData[this.stepEditIndex] 
-        stepData.note = newNote
-        this.updateStepData(stepData)
-      },
-      updateStepData(stepUpdate) {
-        this.sequencer.updateStep(stepUpdate, this.trackIndex, this.stepEditIndex)
       },
       setEditable(index) {
         this.stepEditIndex = (index === this.stepEditIndex) ? null : index
@@ -248,20 +206,26 @@
       }
     },
     watch: {
+      state: function(newState) {
+
+        if (newState === this.state)
+          return
+
+        if (newState === 'started')
+          this.sequencer.start()
+
+        else if (newState === 'stopped')
+          this.sequencer.stop()
+
+        else if (newState === 'paused')
+          this.sequencer.pause()
+
+      },
       tempo: function(newTempo) {
         this.sequencer.updateTempo(parseInt(newTempo))
       }
     },
     computed: {
-      sourceEditorEnabled() {
-        const track = this.tracks[this.trackIndex]
-        return this.stepEditIndex != null &&
-               this.stepEditIndex >= 0    &&
-               Boolean(track.sequence[this.stepEditIndex])
-      },
-      sourceEditorSource() {
-        return this.tracks[this.trackIndex].stepData[this.stepEditIndex]
-      },
       sequence() {
         return this.tracks[this.trackIndex].sequence
       },

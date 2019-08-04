@@ -3,11 +3,11 @@
 
   .source-editor {
 
-    &:not(.active) {
+    &:not(.enabled) {
       visibility: hidden;
     }
     opacity: 1;
-    &:not(.active) {
+    &:not(.enabled) {
       opacity: 0.5;
     }
 
@@ -114,7 +114,7 @@
   }
 </style>
 <template>
-  <div class="source-editor" :class="{ active }">
+  <div class="source-editor" :class="{ enabled }">
     <div class="source-editor__sound-source-selector">
 
       <!-- restore when audio files are supported
@@ -158,7 +158,7 @@
         v-for="(paramValue, paramName) in source.envelope">
           <input 
           @input="onParamChange"
-          :disabled="!active"
+          :disabled="!enabled"
           v-model.number="source.envelope[paramName]"
           class="param"
           type="range" 
@@ -180,7 +180,7 @@
   export default {
     name: 'SourceEditor',
     props: {
-      active: {
+      enabled: {
         type: Boolean,
       },
       source: {

@@ -22,6 +22,7 @@ export default class Sequencer {
     tempo = requiredParam('tempo'),
     tracks = requiredParam('tracks'),
     trackIndex = requiredParam('trackIndex'),
+    transport = requiredParam('transport')
     ui = { activeStep: 0 }
 
   }) {
@@ -31,7 +32,7 @@ export default class Sequencer {
     this.trackIndex = trackIndex
     this.stepIndex = 0
 
-    this.transport = Tone.Transport
+    this.transport = transport
     this.transport.bpm.value = tempo
 
     this.ui = ui
