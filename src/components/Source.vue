@@ -24,20 +24,54 @@
         grid-template-columns: repeat(12, 1fr);
         grid-column-gap: 10px;
         grid-row-gap: 10px;
-        margin: 0;
+        margin: 10px 0px;
         padding: 0;
 
+        .note-names {
+          margin: 0;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .note-name {
+            text-align: center;
+            list-style-type: none;
+            padding: 10px;
+          }
+        }
         .note {
           list-style-type: none;
-          border-radius: 20px;
           background: lightblue;
           padding: 10px;
 
+          &.octave-7 {
+            background: scale-color($lightblue, $lightness: 0%);
+          }
+          &.octave-6 {
+            background: scale-color($lightblue, $lightness: 10%);
+          }
+          &.octave-5 {
+            background: scale-color($lightblue, $lightness: 20%);
+          }
+          &.octave-4 {
+            background: scale-color($lightblue, $lightness: 30%);
+          }
+          &.octave-3 {
+            background: scale-color($lightblue, $lightness: 40%);
+          }
+          &.octave-2 {
+            background: scale-color($lightblue, $lightness: 50%);
+          }
+          &.octave-1 {
+            background: scale-color($lightblue, $lightness: 60%);
+          }
           &.selected {
             background: salmon;
           }
+
         }
         .note-name {
+          text-align: center;
           list-style-type: none;
         }
       }
@@ -103,16 +137,17 @@
     class="source-editor__synth-editor">
 
       <ul class="notes">
-        <li class="note-name" :title="note" v-for="note in source.SCALE.slice(0,12)">{{note}}</li>
-      </ul>
-
-      <ul class="notes">
         <li 
-        v-for="note in source.SCALE"
+          v-for="note in source.SCALE.slice(0,12)"
+          class="note-name">{{ getNoteName(note) }}</li>
+
+        <li 
+        v-for="(note, index) in notesByOctave"
         @click="assignNote(note)"
         :title="note"
         :class="{
-          'selected': source.note === note
+          'selected': source.note === note,
+          ['octave-' + (parseInt(note.slice(-1)[0]) + 1)]: true
         }"
         class="note"></li>
       </ul>
@@ -130,7 +165,7 @@
           min="0.01"
           max="1.0"
           step="0.01" />
-          <label class="param-label">{{ paramName[0].toUpperCase() }}</label>
+          <label class="param-label">{{ paramName }}</label>
           <label class="param-label">{{ paramValue }}</label>
         </div>
       </div>
@@ -160,14 +195,33 @@
       }
     },
     methods: {
+      getNoteName(note) {
+        return note.replace(/[0-9]/,'') 
+      },
       assignNote(note) {
         this.$emit('source-editor-note-assign', note)
       },
       onParamChange(e) {
         this.$emit('source-editor-param-change', this.source)
       }
+    },
+    computed: {
+      notesByOctave() {
+
+        const chromaticScales = this.source.SCALE
+
+        return [ ...Array(chromaticScales.length / 12).keys() ]
+          .reduce((octaves, octave, index) => {
+            const start = octave * 12,
+                  end = start + 12
+            octaves[index] = chromaticScales.slice(start, end)
+            return octaves
+          }, [])
+          .reverse()
+          .flat()
+
+      }
     }
   }
 
 </script>
-

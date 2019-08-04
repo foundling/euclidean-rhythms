@@ -172,8 +172,10 @@
     },
     methods: {
       updateTempo(newTempo) {
-        // listening twice to tempo change event. maybe an event bus?
-        //https://stackoverflow.com/questions/42615445/vuejs-2-0-emit-event-from-grand-child-to-his-grand-parent-component
+        /* 
+          listening twice to tempo change event. maybe an event bus?
+          https://stackoverflow.com/questions/42615445/vuejs-2-0-emit-event-from-grand-child-to-his-grand-parent-component
+        */
         this.tempo = newTempo
       },
       initTracks(trackCount, n, k) {
