@@ -10,6 +10,20 @@
   </div>
 </template>
 
+<style lang="scss" scoped>
+  .tempo-control {
+    padding: 10px;
+    input.tempo {
+      border: 1px solid black;
+      text-align: right; // why align right to center it? 
+      font-size: 2em; 
+      color: white;
+      background: black;
+      font-family: monospace;
+    }
+  }
+</style>
+
 <script>
 
   export default {
@@ -32,17 +46,3 @@
   }
 
 </script>
-
-<style lang="scss" scoped>
-  .tempo-control {
-    padding: 10px;
-    input.tempo {
-      border: 1px solid black;
-      text-align: right; // why align right to center it? 
-      font-size: 2em; 
-      color: white;
-      background: black;
-      font-family: monospace;
-    }
-  }
-</style>

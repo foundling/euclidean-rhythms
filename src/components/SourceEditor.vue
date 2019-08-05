@@ -157,7 +157,7 @@
         class="param-wrapper"
         v-for="(paramValue, paramName) in source.envelope">
           <input 
-          @input="onParamChange"
+          @input="updateSourceEnvelope(source.envelope)"
           :disabled="!enabled"
           v-model.number="source.envelope[paramName]"
           class="param"
@@ -185,7 +185,9 @@
       },
       source: {
         type: Object,
-        default: function() { return Synth.defaultSettings },
+        default() {
+          return Synth.defaultSettings
+        }
       }
     },
     data: function() {
@@ -201,8 +203,8 @@
       assignNote(note) {
         this.$emit('source-editor-note-assign', note)
       },
-      onParamChange(e) {
-        this.$emit('source-editor-param-change', this.source)
+      updateSourceEnvelope(envelopeSettings) {
+        this.$emit('source-editor-envelope-change', envelopeSettings)
       }
     },
     computed: {

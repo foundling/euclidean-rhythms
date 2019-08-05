@@ -74,13 +74,10 @@
     },
     methods: {
       selectTrack(newTrackIndex) {
-
         if (newTrackIndex === this.index)
           return
-
         this.index = newTrackIndex 
         this.$emit('track-selector-update', this.index)
-
       },
       isActiveTrack(index) {
         return index === this.index

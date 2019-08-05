@@ -4,6 +4,7 @@ sequencer:
   manually add/subtract a pulse
   random pulse distribution
   octave buttons
+  shift click on a pulse in order to bulk edit. takes the target note, and copies all of the values for that step to the others.
 
 
 todo:

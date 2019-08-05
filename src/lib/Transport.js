@@ -1,18 +1,9 @@
 import Tone from 'tone'
 
-export default {
-  transport: Tone.transport,
-  updateTempo() {
-    this.transport
-  }
+export default class Transport {
 
-}
-const transport = Tone.transport
-    this.transport.bpm.value = tempo
-
-
-  updateTempo(newTempo) {
-    this.transport.bpm.value = newTempo
+  constructor() {
+    this.transport = Tone.Transport
   }
 
   start() {
@@ -25,5 +16,18 @@ const transport = Tone.transport
 
   stop() {
     this.transport.stop()
-    this.ui.activeStep = this.stepIndex = 0
   }
+
+  get tempo() {
+    return this.transport.bpm.value
+  }
+
+  set tempo(bpm) {
+    return this.transport.bpm.value = bpm
+  }
+
+  get state() {
+    return this.transport.state
+  }
+
+}

@@ -1,6 +1,7 @@
 import Tone from 'tone'
 import { requiredParam, range } from './utils'
 import Synth from './Synth'
+import Transport from './Transport'
 
 const defaultSettings = {
   frequency: 'G0',
@@ -19,10 +20,8 @@ export default class Sequencer {
 
   constructor({ 
 
-    tempo = requiredParam('tempo'),
     tracks = requiredParam('tracks'),
     trackIndex = requiredParam('trackIndex'),
-    transport = requiredParam('transport')
     ui = { activeStep: 0 }
 
   }) {
@@ -31,10 +30,6 @@ export default class Sequencer {
     this.tracks = tracks
     this.trackIndex = trackIndex
     this.stepIndex = 0
-
-    this.transport = transport
-    this.transport.bpm.value = tempo
-
     this.ui = ui
 
   }
@@ -66,31 +61,12 @@ export default class Sequencer {
 
   }
 
-
-
   updateStep(newStepData, trackIndex, stepEditIndex) {
     this.tracks[trackIndex].stepData[stepEditIndex] = newStepData
   }
 
   updateSequence(trackIndex, newSequence) {
     this.tracks[trackIndex].sequence = newSequence
-  }
-
-  updateTempo(newTempo) {
-    this.transport.bpm.value = newTempo
-  }
-
-  start() {
-    this.transport.start()
-  }
-
-  pause() {
-    this.transport.pause()
-  }
-
-  stop() {
-    this.transport.stop()
-    this.ui.activeStep = this.stepIndex = 0
   }
 
 }

@@ -3,30 +3,27 @@
 
     <Logo />
 
-    <Transport 
-    :tempo="tempo"
-    :transport-state="transportState"
-    v-on:transport-started="updateTransportState"
-    v-on:transport-stopped="updateTransportState"
-    v-on:transport-paused="updateTransportState"
-    v-on:tempo-change="updateTempo" />
+    <Transport :tempo="tempo" v-on:tempo-updated="updateTempo"/>
 
-    <Sequencer 
+    <Sequencer
     :track-count="trackCount"
-    :initial-tempo="tempo"
+    :tracks="tracks"
+    :track-index="trackIndex"
     :steps="steps"
-    :pulses="pulses" />
+    :pulses="pulses" 
+    :step-edit-index="stepEditIndex"
+    v-on:step-edit-index-updated="updateStepEditIndex" />
 
     <TrackSelector 
     :track-index="trackIndex" 
     :track-count="trackCount" 
     v-on:track-selector-update="updateSelectedTrack" />
 
-    <Source 
-    :active="sourceEditorEnabled" 
-    :source="sourceEditorSource"
-    v-on:source-editor-note-assign="updateStepNote"
-    v-on:source-editor-param-change="updateStepData" />
+    <SourceEditor 
+    :enabled="sourceEditorEnabled" 
+    :source="soundSource"
+    v-on:source-editor-note-assign="updateNoteAtStep"
+    v-on:source-editor-envelope-change="updateEnvelopeAtStep" />
 
 
   </div>
@@ -51,7 +48,6 @@
 
 </style>
 
-
 <script>
 
   import { range } from './lib/utils'
@@ -59,7 +55,7 @@
   import Synth from './lib/Synth'
 
   import Sequencer from './components/Sequencer.vue'
-  import Source from './components/Source.vue'
+  import SourceEditor from './components/SourceEditor.vue'
   import TrackSelector from './components/TrackSelector.vue'
   import Transport from './components/Transport.vue'
   import Logo from './components/Logo'
@@ -70,7 +66,7 @@
     components: { 
       Logo,
       Sequencer,
-      Source,
+      SourceEditor,
       TrackSelector,
       Transport 
     },
@@ -82,6 +78,7 @@
         trackCount: 4,
         tracks: null,
         trackIndex: 0,
+        stepEditIndex: null,
         transportState: 'stopped'
       }
     },
@@ -100,23 +97,33 @@
           }
         })
       },
-      updateTempo(newTempo) {
-        this.tempo = newTempo
-      }, 
       updateTransportState(newState) {
-        debugger
+        if (newState !== this.transportState)
+          this.transportState = newState
       },
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex
       },
-      updateStepNote(newNote) {
-        const stepData = this.tracks[this.trackIndex].stepData[this.stepEditIndex] 
-        stepData.note = newNote
-        this.updateStepData(stepData)
+      updateStepEditIndex(newEditIndex) {
+        this.stepEditIndex = newEditIndex
       },
-      updateStepData(stepUpdate) {
-        this.sequencer.updateStep(stepUpdate, this.trackIndex, this.stepEditIndex)
+      updateTempo(newTempo) {
+        this.tempo = newTempo
+      },
+
+      /* these need work */
+      updateNoteAtStep(newNote) {
+        if (this.stepEditIndex == null)
+          return
+        this.tracks[this.trackIndex].stepData[this.stepEditIndex].note = newNote 
+        this.stepEditIndex = this.stepEditIndex
+      },
+      updateEnvelopeAtStep(envelopeData) {
+        if (this.stepEditIndex == null)
+          return
+        this.tracks[this.trackIndex].stepData[this.stepEditIndex].envelope = envelopeData
       }
+
     },
     computed: {
       sourceEditorEnabled() {
@@ -125,13 +132,8 @@
                this.stepEditIndex >= 0    &&
                Boolean(track.sequence[this.stepEditIndex])
       },
-      sourceEditorSource() {
-        return this.tracks[this.trackIndex].stepData[this.stepEditIndex]
-      }
-    },
-    watch: {
-      transportState(newState) {
-        debugger
+      soundSource() {
+        return this.tracks[this.trackIndex].stepData[this.stepEditIndex] || Synth.defaultSettings
       }
     }
   }

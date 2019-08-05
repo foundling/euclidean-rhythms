@@ -92,20 +92,14 @@
   import { ER, degreesToRadians } from '../lib/equations'
   import Sequencer from '../lib/Sequencer'
   import Synth from '../lib/Synth'
-  import Tempo from './Tempo'
-  import Source from './Source'
-  import TrackSelector from './TrackSelector'
-  import Transport from './Transport'
 
   export default {
     name: 'Sequencer',
-    components: { 
-      Tempo, 
-      Source, 
-      Transport,
-      TrackSelector 
-    },
+    components: {},
     props: {
+      trackIndex: {
+        type: Number
+      },
       pulses: {
         type: Number
       },
@@ -115,22 +109,17 @@
       trackCount: {
         type: Number
       },
-      initialTempo: {
-        type: Number
+      tracks: {
+        type: Array
       },
-      state: {
-        type: String,
-        validator(s) {
-          return ['started','stopped','paused'].includes(s)
-        }
+      stepEditIndex: {
+        type: Number
       }
     },
     data: function() {
       return {
         n: this.steps,
         k: this.pulses,
-        trackIndex: 0,
-        stepEditIndex: null,
         ui: { 
           activeStep: null 
         }
@@ -138,7 +127,6 @@
     },
     created() {
       this.sequencer = new Sequencer({
-        tempo: this.tempo,
         ui: this.ui,
         audioContext: new (window.AudioContext || AudioContext), 
         tracks: this.tracks,
@@ -147,26 +135,17 @@
       this.sequencer.init()
     },
     methods: {
-      updateTempo(newTempo) {
-        /* 
-          listening twice to tempo change event. maybe an event bus?
-          https://stackoverflow.com/questions/42615445/vuejs-2-0-emit-event-from-grand-child-to-his-grand-parent-component
-        */
-        this.tempo = newTempo
-      },
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex
       },
       setSequences(n, k, sequenceCount) {
-        return range(sequenceCount).map(_ => {
-          return ER(n, k)
-        })
+        return range(sequenceCount).map(_ => ER(n, k))
       },
       setSequence(n, k) {
         return ER(n, k)
       },
       setEditable(index) {
-        this.stepEditIndex = (index === this.stepEditIndex) ? null : index
+        this.$emit('step-edit-index-updated', index)
       },
       isEditable(index) {
         return index === this.stepEditIndex
@@ -220,9 +199,6 @@
         else if (newState === 'paused')
           this.sequencer.pause()
 
-      },
-      tempo: function(newTempo) {
-        this.sequencer.updateTempo(parseInt(newTempo))
       }
     },
     computed: {
