@@ -2,9 +2,9 @@
   <div class="transport">
 
     <div class="playhead-controls">
-      <button @click="start" class="fas fa-play" />
-      <button @click="stop" class="fas fa-stop" />
-      <button @click="pause" class="fas fa-pause" />
+      <button @keyup.enter="start" @click="start" class="fas fa-play" />
+      <button @keyup.enter="stop" @click="stop" class="fas fa-stop" />
+      <button @keyup.enter="pause" @click="pause" class="fas fa-pause" />
     </div>
 
     <Tempo v-on:tempo-change="updateTempo" :tempo="tempo" />
@@ -28,7 +28,7 @@
     },
     data: function() {
       return {
-        transport: new Transport()
+        transport: new Transport({ bpm: this.tempo })
       }
     },
     methods: {
