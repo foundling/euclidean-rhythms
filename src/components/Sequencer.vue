@@ -72,7 +72,8 @@
 
     <circle 
       v-for="(circle, index) in circles" 
-      @click="setEditable(index)"
+      @click.exact="setEditable(index)"
+      @click.shift.exact="setEditable(index, true)"
       @keyup.enter="setEditable(index)"
       :tabindex="index + 2"
       :id="`step-${index}`"
@@ -101,24 +102,12 @@
     name: 'Sequencer',
     components: {},
     props: {
-      trackIndex: {
-        type: Number
-      },
-      pulses: {
-        type: Number
-      },
-      steps: {
-        type: Number
-      },
-      trackCount: {
-        type: Number
-      },
-      tracks: {
-        type: Array
-      },
-      stepEditIndex: {
-        type: Number
-      }
+      trackIndex: Number,
+      pulses: Number,
+      steps: Number,
+      trackCount: Number,
+      tracks: Array,
+      stepEditIndexes: Array
     },
     data: function() {
       return {
@@ -148,11 +137,14 @@
       setSequence(n, k) {
         return ER(n, k)
       },
-      setEditable(index) {
-        this.$emit('step-edit-index-updated', index)
+      setEditable(index, multiple=false) {
+        // if multiple is true, take the last step edit index in the array that is also a pulse
+        this.$emit('step-edit-index-updated', index, multiple)
       },
       isEditable(index) {
-        return index === this.stepEditIndex
+        // there may be stepEditIndexes values that aren't valid because
+        // they aren't on a pulse
+        return this.tracks[this.trackIndex].sequence[index] && this.stepEditIndexes.includes(index)
       },
       isActiveStep(stepIndex, activeStep) {
         return stepIndex === activeStep
@@ -186,23 +178,6 @@
       pauseSequence() {
         if (this.sequencer.state !== 'paused')
           this.sequencer.pause()
-      }
-    },
-    watch: {
-      state: function(newState) {
-
-        if (newState === this.state)
-          return
-
-        if (newState === 'started')
-          this.sequencer.start()
-
-        else if (newState === 'stopped')
-          this.sequencer.stop()
-
-        else if (newState === 'paused')
-          this.sequencer.pause()
-
       }
     },
     computed: {

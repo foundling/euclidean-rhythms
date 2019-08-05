@@ -11,8 +11,8 @@
     :track-index="trackIndex"
     :steps="steps"
     :pulses="pulses" 
-    :step-edit-index="stepEditIndex"
-    v-on:step-edit-index-updated="updateStepEditIndex" />
+    :step-edit-indexes="stepEditIndexes"
+    v-on:step-edit-index-updated="updateStepEditIndexes" />
 
     <TrackSelector 
     :track-index="trackIndex" 
@@ -78,7 +78,7 @@
         trackCount: 4,
         tracks: null,
         trackIndex: 0,
-        stepEditIndex: null,
+        stepEditIndexes: [],
         transportState: 'stopped'
       }
     },
@@ -104,36 +104,65 @@
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex
       },
-      updateStepEditIndex(newEditIndex) {
-        this.stepEditIndex = (this.stepEditIndex === newEditIndex) ? null : newEditIndex
+      updateStepEditIndexes(newEditIndex, multiple) {
+
+        const isPulse = Boolean(this.tracks[this.trackIndex].sequence[newEditIndex]) 
+        if (!isPulse)
+          return
+          
+        if (multiple) {
+        // multiple selected, in which case we add this
+          this.stepEditIndexes.push(newEditIndex)
+        } else if (this.stepEditIndexes.includes(newEditIndex)) {
+          this.stepEditIndexes = []
+        // toggling single edit from on -> off
+        } else {
+          this.stepEditIndexes = [ newEditIndex ]
+        // or single toggled on
+        }
+
       },
       updateTempo(newTempo) {
         this.tempo = newTempo
       },
-
-      /* these need work */
+      // TODO: just use a single function to replace entire step data object
+      //simpler 
       updateNoteAtStep(newNote) {
-        if (this.stepEditIndex == null)
+
+        // if there are multiple stepEditIndexes, take the last one clicked 
+        if (!this.stepEditIndexes.length)
           return
-        this.tracks[this.trackIndex].stepData[this.stepEditIndex].note = newNote 
-        this.stepEditIndex = this.stepEditIndex
+
+        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
+
+        // alex: resume here
+        // for each step edit index that is a pulse, that's not the source:
+        // copy source to those
+        const self = this
+        this.stepEditIndexes.forEach(i => {
+          if (self.tracks[this.trackIndex].sequence[i] === 1) { 
+            self.tracks[self.trackIndex].stepData[i].note = newNote
+          }
+        })
       },
       updateEnvelopeAtStep(envelopeData) {
-        if (this.stepEditIndex == null)
+        // if there are multiple stepEditIndexes, take the last one clicked 
+        if (!this.stepEditIndexes.length)
           return
-        this.tracks[this.trackIndex].stepData[this.stepEditIndex].envelope = envelopeData
+        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
+        this.tracks[this.trackIndex].stepData[lastStepEditIndex].envelope = envelopeData
       }
 
     },
     computed: {
       sourceEditorEnabled() {
         const track = this.tracks[this.trackIndex]
-        return this.stepEditIndex != null &&
-               this.stepEditIndex >= 0    &&
-               Boolean(track.sequence[this.stepEditIndex])
+        return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
       },
       soundSource() {
-        return this.tracks[this.trackIndex].stepData[this.stepEditIndex] || Synth.defaultSettings
+        // if there are multiple stepEditIndexes, take the last one clicked 
+        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
+        return this.tracks[this.trackIndex].stepData[lastStepEditIndex] || Synth.defaultSettings
       }
     }
   }
