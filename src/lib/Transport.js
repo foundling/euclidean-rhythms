@@ -2,8 +2,9 @@ import Tone from 'tone'
 
 export default class Transport {
 
-  constructor() {
+  constructor({ bpm = 120 }) {
     this.transport = Tone.Transport
+    this.transport.bpm.value = bpm
   }
 
   start() {

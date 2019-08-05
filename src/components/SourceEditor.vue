@@ -18,7 +18,6 @@
       display: flex;
       flex-direction: column;
 
-
       .notes {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
@@ -75,29 +74,18 @@
           list-style-type: none;
         }
       }
-      .param-wrapper:nth-child(1) {
-        background: $track-1;
-      }
-      .param-wrapper:nth-child(2) {
-        background: $track-2;
-      }
-      .param-wrapper:nth-child(3) {
-
-        background: $track-3;
-      }
-      .param-wrapper:nth-child(4) {
-        background: $track-4;
+      .param-wrapper {
+        background: whitesmoke;
+        padding: 25px !important;
       }
 
       .params {
         display: flex;
 
         .param-wrapper {
-          padding: 5px;
           width: calc(100%/4);
           display: flex;
           flex-direction: column;
-          padding: 5px;
 
           .param {
             width: 100%;

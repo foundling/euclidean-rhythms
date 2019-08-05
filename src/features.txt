@@ -6,7 +6,6 @@ sequencer:
   octave buttons
   shift click on a pulse in order to bulk edit. takes the target note, and copies all of the values for that step to the others.
 
-
 todo:
   color coded guide. choose colors friendly to people w/ colorblindness.
   rename source/tempo to two word names, per Vue best practices

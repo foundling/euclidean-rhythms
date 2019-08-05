@@ -63,6 +63,8 @@
   
     <circle
       @click="addPulse"
+      @keyup.enter="addPulse"
+      tabindex="1"
       class="center"
       cx="200"
       cy="200"
@@ -71,6 +73,8 @@
     <circle 
       v-for="(circle, index) in circles" 
       @click="setEditable(index)"
+      @keyup.enter="setEditable(index)"
+      :tabindex="index + 2"
       :id="`step-${index}`"
       :class="{ 
         'editing': isEditable(index),

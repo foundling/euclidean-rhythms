@@ -105,7 +105,7 @@
         this.trackIndex = newTrackIndex
       },
       updateStepEditIndex(newEditIndex) {
-        this.stepEditIndex = newEditIndex
+        this.stepEditIndex = (this.stepEditIndex === newEditIndex) ? null : newEditIndex
       },
       updateTempo(newTempo) {
         this.tempo = newTempo
