@@ -44,14 +44,18 @@ export default class Sequencer {
 
       Tone.Draw.schedule(function() {
         self.ui.activeStep = stepIndex
-        // use stepIndex instead, put before pulse
-        //self.ui.activeStep = (self.ui.activeStep + 1) % sequence.length
       }, time)
+
       let notesAtStep = self.tracks
         .map(({ sequence, stepData }) => sequence[stepIndex] ? stepData[stepIndex].note : null) 
         .filter(Boolean)
 
       if (notesAtStep.length) {
+        // todo: implement envelopes
+        //
+        // - either create multiple mono synths, and give each the separate adsr values, OR
+        // - change the way params are handled so the params are global across tracks (n params total, not (TRACKS x n) params) 
+        //
         polySynth.triggerAttackRelease(notesAtStep, '16n')
       }
 
