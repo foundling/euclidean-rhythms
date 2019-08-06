@@ -1,12 +1,21 @@
 sequencer:
-  solo/mute channel
-  reverse seq direction
-  manually add/subtract a pulse
-  random pulse distribution
-  octave buttons
-  shift click on a pulse in order to bulk edit. takes the target note, and copies all of the values for that step to the others.
+  sequence direction:
+    solo/mute channel
+    reverse seq direction
+    manually add/subtract a pulse
+    random pulse distribution
+    per step/track octave buttons (that mutate underlying step data)
+
+  bulk select/deselect:
+    shift click on a pulse in order to bulk edit. takes the target note, and copies all of the values for that step to the others.
+
+  note selector:
+    play note when we click on note selector 
+    give sharped notes different collor
 
 todo:
+  offer a pre-existing list of pattern configs to choose from
+  manual
   color coded guide. choose colors friendly to people w/ colorblindness.
   rename source/tempo to two word names, per Vue best practices
   fix ui color priorities so it's easier to use at first 
