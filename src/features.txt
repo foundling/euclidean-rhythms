@@ -14,6 +14,7 @@ sequencer:
     give sharped notes different collor
 
 todo:
+  mute track when active track is clicked, unmute
   offer a pre-existing list of pattern configs to choose from
   manual
   color coded guide. choose colors friendly to people w/ colorblindness.

@@ -44,6 +44,11 @@
 
     & > * { width: 100%; }
 
+    @media(max-width: 500px) {
+      width: 100%;
+      height: 500px;
+    }
+
   }
 
 </style>
@@ -134,10 +139,6 @@
           return
 
         const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
-
-        // alex: resume here
-        // for each step edit index that is a pulse, that's not the source:
-        // copy source to those
         const self = this
         this.stepEditIndexes.forEach(i => {
           if (self.tracks[this.trackIndex].sequence[i] === 1) { 

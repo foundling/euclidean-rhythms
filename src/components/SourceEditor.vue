@@ -124,6 +124,24 @@
     v-show="soundSource === 'synthesizer'"
     class="source-editor__synth-editor">
 
+      <div class="params"> 
+        <div
+        class="param-wrapper"
+        v-for="(paramValue, paramName) in source.envelope">
+          <input 
+          v-model.number="source.envelope[paramName]"
+          @input="updateSourceEnvelope(source.envelope)"
+          :disabled="!enabled"
+          class="param"
+          type="range" 
+          min="0.01"
+          max="1.0"
+          step="0.01" />
+          <label class="param-label">{{ paramName }}</label>
+          <label class="param-label">{{ paramValue }}</label>
+        </div>
+      </div>
+
       <ul class="notes">
         <li 
           v-for="note in source.SCALE.slice(0,12)"
@@ -140,23 +158,7 @@
         class="note"></li>
       </ul>
 
-      <div class="params"> 
-        <div
-        class="param-wrapper"
-        v-for="(paramValue, paramName) in source.envelope">
-          <input 
-          @input="updateSourceEnvelope(source.envelope)"
-          :disabled="!enabled"
-          v-model.number="source.envelope[paramName]"
-          class="param"
-          type="range" 
-          min="0.01"
-          max="1.0"
-          step="0.01" />
-          <label class="param-label">{{ paramName }}</label>
-          <label class="param-label">{{ paramValue }}</label>
-        </div>
-      </div>
+
     </div>
 
   </div>
