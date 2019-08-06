@@ -10,4 +10,5 @@ todo:
   color coded guide. choose colors friendly to people w/ colorblindness.
   rename source/tempo to two word names, per Vue best practices
   fix ui color priorities so it's easier to use at first 
-
+  convert play controls to separate component, then nest that and Tempo inside of Transport, so you can
+  remove complexity in grandchild -> grandparent communication of tempo change. 
