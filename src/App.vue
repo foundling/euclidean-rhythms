@@ -15,8 +15,10 @@
     v-on:step-edit-index-updated="updateStepEditIndexes" />
 
     <TrackSelector 
-    :track-index="trackIndex" 
+    :track-index="trackIndex"
     :track-count="trackCount" 
+    :muted-track-index="mutedTrackIndex"
+    v-on:track-selector-track-muted="toggleTrackMute(trackIndex)"
     v-on:track-selector-update="updateSelectedTrack" />
 
     <SourceEditor 
@@ -97,10 +99,14 @@
           return {
             n,
             k,
+            muted: false,
             sequence: ER(n, k),
-            stepData: range(n).map(_ => Synth.defaultSettings)
+            stepData: range(n).map(_ => Synth.defaultSettings),
           }
         })
+      },
+      toggleTrackMute(trackIndex) {
+        this.tracks[trackIndex].muted = !this.tracks[trackIndex].muted
       },
       updateTransportState(newState) {
         if (newState !== this.transportState)
@@ -156,6 +162,16 @@
 
     },
     computed: {
+      mutedTrackIndex() {
+        return this.tracks.reduce((indexOfMutedTrack, track, index) => {
+          if (indexOfMutedTrack !== null)
+            return indexOfMutedTrack
+          else if (track.muted)
+            return index
+          else
+            return null
+        }, null)
+      },
       sourceEditorEnabled() {
         const track = this.tracks[this.trackIndex]
         return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
@@ -169,4 +185,3 @@
   }
 
 </script>
-

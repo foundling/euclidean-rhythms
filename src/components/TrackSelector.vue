@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: space-around;
 
-    button.track  {
+    .track  {
       border: none;
       box-sizing: border-box;
       height: 80px;
@@ -34,6 +34,11 @@
       }
       &.active {
         color: gray;
+
+        &.muted {
+          background: red;
+          color: gray;
+        }
       }
 
     }
@@ -45,13 +50,14 @@
 <template>
   <div class="track-selector">
     <button 
-      class="track"
       v-for="(v,i) in trackCount"
       :class="{
         ['track-'+ v]: true,
-        'active': isActiveTrack(i)
+        'muted': isMuted(i),
+        'active': isActiveTrack(i),
       }"
-      @click="selectTrack(i)">{{ v }}</button>
+      @click="selectOrMuteTrack(i)"
+      class="track">{{ v }}</button>
   </div>
 </template>
 
@@ -60,6 +66,9 @@
   export default {
     name: 'TrackSelector',
     props: {
+      mutedTrackIndex: {
+        type: Number
+      },
       trackCount: {
         type: Number
       },
@@ -73,14 +82,19 @@
       }
     },
     methods: {
-      selectTrack(newTrackIndex) {
-        if (newTrackIndex === this.index)
-          return
-        this.index = newTrackIndex 
-        this.$emit('track-selector-update', this.index)
+      selectOrMuteTrack(trackIndex) {
+        if (trackIndex === this.index) {
+          this.$emit('track-selector-track-muted', this.index)
+        } else {
+          this.index = trackIndex 
+          this.$emit('track-selector-update', this.index)
+        }
       },
       isActiveTrack(index) {
         return index === this.index
+      },
+      isMuted(index) {
+        return index === this.mutedTrackIndex
       }
     }
   }
