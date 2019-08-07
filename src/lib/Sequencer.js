@@ -65,7 +65,8 @@ export default class Sequencer {
           synths[trackIndex].envelope.decay = stepData[stepIndex].envelope.decay
           synths[trackIndex].envelope.sustain = stepData[stepIndex].envelope.sustain
           synths[trackIndex].envelope.release = stepData[stepIndex].envelope.release
-          synths[trackIndex].triggerAttackRelease(stepData[stepIndex].note, '16n')
+
+          synths[trackIndex].triggerAttackRelease(stepData[stepIndex].note, '8n')
 
         }
       }
