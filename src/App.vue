@@ -119,11 +119,16 @@
       toggleTrackMute(trackIndex) {
         this.tracks[trackIndex].muted = !this.tracks[trackIndex].muted
       },
-      rotateTrackSequence(newRotationCount) {
-        this.tracks[this.trackIndex].rotation = newRotationCount
-      },
       reverseSequenceDirection(direction) {
         this.tracks[this.trackIndex].direction = direction
+      },
+      rotateTrackSequence() {
+
+        this.tracks[this.trackIndex].rotation += 1
+
+        const { sequence } = this.tracks[this.trackIndex]
+        sequence.unshift(sequence.pop())
+
       },
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex

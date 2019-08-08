@@ -1,8 +1,6 @@
 <template>
   <div class="sequencer-controls">
-    <label>
-      rotation: <button @click="incrementRotation">{{ rotation }}</button>
-    </label>
+    <button @click="incrementRotation">rotation: {{ rotation }}</button>
     <i 
     @click="reverseDirection('counter-clockwise')" 
     :class="{'selected': direction === 'counter-clockwise'}"
