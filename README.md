@@ -1,6 +1,6 @@
-# euclidian_rhythms
+# Euclidian Rhythms
 
-Experimenting with the Euclid's GCD algorithm in the realm of sequencing. 
+A step sequencer based on Euler's Greatest Common Divisor algorithm.
 
 ## References
 
