@@ -44,7 +44,6 @@
         fill: coral;
       } 
 
-
       &.pulse {
         fill: aqua;
       }
@@ -109,12 +108,16 @@
     name: 'Sequencer',
     components: {},
     props: {
-      trackIndex: Number,
+      direction: {
+        type: String,
+        validator: dir => ['clockwise','counter-clockwise'].includes(dir)
+      },
       pulses: Number,
       steps: Number,
+      stepEditIndexes: Array,
       trackCount: Number,
+      trackIndex: Number,
       tracks: Array,
-      stepEditIndexes: Array
     },
     data: function() {
       return {
@@ -127,10 +130,10 @@
     },
     created() {
       this.sequencer = new Sequencer({
-        ui: this.ui,
         audioContext: new (window.AudioContext || AudioContext), 
-        tracks: this.tracks,
         trackIndex: this.trackIndex,
+        tracks: this.tracks,
+        ui: this.ui,
       })
       this.sequencer.init()
     },
@@ -185,6 +188,17 @@
       pauseSequence() {
         if (this.sequencer.state !== 'paused')
           this.sequencer.pause()
+      }
+    },
+    watch: {
+      trackIndex(newIndex, oldIndex) {
+        this.sequencer.trackIndex = newIndex
+      },
+      direction(newDirection, oldDirection) {
+        this.tracks[this.trackIndex]
+        if (newDirection !== oldDirection) {
+          this.sequencer.reverseDirection(newDirection)
+        }
       }
     },
     computed: {

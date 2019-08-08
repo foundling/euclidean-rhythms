@@ -25,7 +25,7 @@ export default class Sequencer {
 
     tracks = requiredParam('tracks'),
     trackIndex = requiredParam('trackIndex'),
-    ui = { activeStep: 0 }
+    ui = { activeStep: 0 },
 
   }) {
 
@@ -38,49 +38,48 @@ export default class Sequencer {
 
   init() {
 
-    const synths = range(this.tracks.length)
-      .map(_ => new Tone.Synth(defaultSettings).toMaster())
-    const { sequence, stepData } = this.tracks[this.trackIndex]
     const self = this
+    const synths = range(self.tracks.length)
+      .map(_ => new Tone.Synth(defaultSettings).toMaster())
 
-    this.sequencer = new Tone.Sequence(function(time, stepIndex) {
+    self.sequencer = new Tone.Sequence(function(time, globalStepIndex) {
 
-      // is this the right way to sync audio/visual?
+      const { sequence } = self.tracks[self.trackIndex]
+
+      // is this the right way to sync audio with UI?
       Tone.Draw.schedule(function() {
-        self.ui.activeStep = stepIndex
+        // update ui using currently active track ui
+        const activeTrackDirection = self.tracks[self.trackIndex].direction 
+        const trackStepIndex = activeTrackDirection === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
+        self.ui.activeStep = trackStepIndex 
       }, time)
 
       let notesAtStep = self.tracks
-        //.map(({ sequence, stepData }) => sequence[stepIndex] ? stepData[stepIndex].note : null) 
-        .map(({ sequence, stepData }) => sequence[stepIndex] && stepData[stepIndex].note) 
+        .map(({ sequence, stepData, direction }, trackIndex) => {
+          const trackStepIndex = direction === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
+          return sequence[trackStepIndex] && stepData[trackStepIndex].note
+        })
         .filter(Boolean)
 
       for (let trackIndex = 0; trackIndex < self.tracks.length; trackIndex++) {
 
-        const trackData = self.tracks[trackIndex]
-        const pulseAtStep = Boolean(trackData.sequence[stepIndex])
+        const { sequence, stepData, direction } = self.tracks[trackIndex]
+        const trackStepIndex = direction === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
+        const pulseAtStep = Boolean(sequence[trackStepIndex])
 
         if (pulseAtStep) {
 
-          const { stepData } = trackData 
+          synths[trackIndex].envelope.attack = stepData[trackStepIndex].envelope.attack
+          synths[trackIndex].envelope.decay = stepData[trackStepIndex].envelope.decay
+          synths[trackIndex].envelope.sustain = stepData[trackStepIndex].envelope.sustain
+          synths[trackIndex].envelope.release = stepData[trackStepIndex].envelope.release
 
-          synths[trackIndex].envelope.attack = stepData[stepIndex].envelope.attack
-          synths[trackIndex].envelope.decay = stepData[stepIndex].envelope.decay
-          synths[trackIndex].envelope.sustain = stepData[stepIndex].envelope.sustain
-          synths[trackIndex].envelope.release = stepData[stepIndex].envelope.release
-
-          synths[trackIndex].triggerAttackRelease(stepData[stepIndex].note, '8n')
-
-        }
-      }
-        // bug: notesAtStep != note at step at track
-      if (notesAtStep.length) {
-        for (let i = 0; i < notesAtStep.length; i++) {
+          synths[trackIndex].triggerAttackRelease(stepData[trackStepIndex].note, '8n')
 
         }
       }
 
-    }, range(sequence.length), "8n").start(0)
+    }, range(self.tracks[self.trackIndex].sequence.length), "8n").start(0)
 
   }
 

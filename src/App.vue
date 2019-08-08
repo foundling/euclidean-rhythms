@@ -5,6 +5,9 @@
 
     <Transport :tempo="tempo" v-on:tempo-updated="updateTempo"/>
 
+    <SequencerControls 
+    v-on:sequencer-controls-direction-changed="reverseSequenceDirection" />
+
     <Sequencer
     :track-count="trackCount"
     :tracks="tracks"
@@ -65,6 +68,7 @@
   import Synth from './lib/Synth'
 
   import Sequencer from './components/Sequencer.vue'
+  import SequencerControls from './components/SequencerControls.vue'
   import SourceEditor from './components/SourceEditor.vue'
   import TrackSelector from './components/TrackSelector.vue'
   import Transport from './components/Transport.vue'
@@ -76,6 +80,7 @@
       Logo,
       Sequencer,
       SourceEditor,
+      SequencerControls,
       TrackSelector,
       Transport 
     },
@@ -87,8 +92,7 @@
         trackCount: 4,
         tracks: null,
         trackIndex: 0,
-        stepEditIndexes: [],
-        transportState: 'stopped'
+        stepEditIndexes: []
       }
     },
     created() {
@@ -101,6 +105,7 @@
           return {
             n,
             k,
+            direction: 'clockwise',
             muted: false,
             sequence: ER(n, k),
             stepData: range(n).map(_ => Synth.defaultSettings),
@@ -110,9 +115,8 @@
       toggleTrackMute(trackIndex) {
         this.tracks[trackIndex].muted = !this.tracks[trackIndex].muted
       },
-      updateTransportState(newState) {
-        if (newState !== this.transportState)
-          this.transportState = newState
+      reverseSequenceDirection(direction) {
+        this.tracks[this.trackIndex].direction = direction
       },
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex
@@ -124,23 +128,24 @@
           return
           
         if (multiple) {
-        // multiple selected, in which case we add this
+          // multiple selected, in which case we add this
           this.stepEditIndexes.push(newEditIndex)
         } else if (this.stepEditIndexes.includes(newEditIndex)) {
+          // toggling single edit from on -> off
           this.stepEditIndexes = []
-        // toggling single edit from on -> off
         } else {
+          // or single toggled on
           this.stepEditIndexes = [ newEditIndex ]
-        // or single toggled on
         }
 
       },
       updateTempo(newTempo) {
         this.tempo = newTempo
       },
-      // TODO: just use a single function to replace entire step data object
-      //simpler 
       updateNoteAtStep(newNote) {
+
+        // TODO: just use a single function to replace entire step data object
+        //simpler 
 
         // if there are multiple stepEditIndexes, take the last one clicked 
         if (!this.stepEditIndexes.length)
