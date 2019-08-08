@@ -6,6 +6,9 @@
     <Transport :tempo="tempo" v-on:tempo-updated="updateTempo"/>
 
     <SequencerControls 
+    :direction="currentTrack.direction"
+    :rotation="currentTrack.rotation % currentTrack.sequence.length"
+    v-on:sequencer-controls-rotated="rotateTrackSequence"
     v-on:sequencer-controls-direction-changed="reverseSequenceDirection" />
 
     <Sequencer
@@ -105,6 +108,7 @@
           return {
             n,
             k,
+            rotation: 0,
             direction: 'clockwise',
             muted: false,
             sequence: ER(n, k),
@@ -114,6 +118,9 @@
       },
       toggleTrackMute(trackIndex) {
         this.tracks[trackIndex].muted = !this.tracks[trackIndex].muted
+      },
+      rotateTrackSequence(newRotationCount) {
+        this.tracks[this.trackIndex].rotation = newRotationCount
       },
       reverseSequenceDirection(direction) {
         this.tracks[this.trackIndex].direction = direction
@@ -182,6 +189,9 @@
       sourceEditorEnabled() {
         const track = this.tracks[this.trackIndex]
         return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
+      },
+      currentTrack() {
+        return this.tracks[this.trackIndex]
       },
       soundSource() {
         // if there are multiple stepEditIndexes, take the last one clicked 
