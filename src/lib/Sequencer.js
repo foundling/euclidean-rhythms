@@ -1,23 +1,8 @@
 import Tone from 'tone'
-
 import { requiredParam, range } from './utils'
-
 import Synth from './Synth'
 import Transport from './Transport'
 
-
-const defaultSettings = {
-  frequency: 'C7',
-  oscillator: {
-    type: 'sine'
-  },
-  envelope: {
-    attack: 0.01,
-    decay: 0.4,
-    sustain: 0.4,
-    release: 0.2
-  }
-}
 
 export default class Sequencer {
 
@@ -30,8 +15,8 @@ export default class Sequencer {
   }) {
 
     this.sequencer = null
-    this.tracks = tracks
     this.trackIndex = trackIndex
+    this.tracks = tracks
     this.ui = ui
 
   }
@@ -40,7 +25,7 @@ export default class Sequencer {
 
     const self = this
     const synths = range(self.tracks.length)
-      .map(_ => new Tone.Synth(defaultSettings).toMaster())
+      .map(_ => new Tone.Synth(Synth.defaultSettings).toMaster())
 
     self.sequencer = new Tone.Sequence(function(time, globalStepIndex) {
 
@@ -48,18 +33,11 @@ export default class Sequencer {
 
       // is this the right way to sync audio with UI?
       Tone.Draw.schedule(function() {
-        // update ui using currently active track ui
+        // update ui using currently visibile track's ui
         const activeTrackDirection = self.tracks[self.trackIndex].direction 
         const trackStepIndex = activeTrackDirection === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
         self.ui.activeStep = trackStepIndex 
       }, time)
-
-      let notesAtStep = self.tracks
-        .map(({ sequence, stepData, direction }, trackIndex) => {
-          const trackStepIndex = direction === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
-          return sequence[trackStepIndex] && stepData[trackStepIndex].note
-        })
-        .filter(Boolean)
 
       for (let trackIndex = 0; trackIndex < self.tracks.length; trackIndex++) {
 

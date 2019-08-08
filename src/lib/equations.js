@@ -1,7 +1,8 @@
 import { range } from './utils'
 export const degreesToRadians = d => (d * Math.PI)/180
 
-/* ER algorithm */
+
+/* Euclidian Rhythms algorithm */
 export function ER(n, k) {
   const A = initSequence(n, k)
   return _ER(n, k, A) 
@@ -9,7 +10,7 @@ export function ER(n, k) {
 
 function _ER(n, k, A) {
 
-  // n - k is remainder, or elements to be distributed
+  // n - k is remainder, aka elements remaining to be distributed
   if (n - k <= 1 || k === 0)
     return A.join('').split('').map(Number)
 
@@ -32,8 +33,6 @@ function distribute(n, k, A) {
   return A
 
 }
-
-
 
 export const initSequence = (n, k) => ([
   ...range(k).map(_ => '1'),

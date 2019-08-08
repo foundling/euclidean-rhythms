@@ -124,10 +124,12 @@
       },
       rotateTrackSequence() {
 
+        // rotation should be negative if dir is 
         this.tracks[this.trackIndex].rotation += 1
 
-        const { sequence } = this.tracks[this.trackIndex]
+        const { sequence, stepData } = this.tracks[this.trackIndex]
         sequence.unshift(sequence.pop())
+        stepData.unshift(stepData.pop())
 
       },
       updateSelectedTrack(newTrackIndex) {

@@ -22,19 +22,7 @@
 </style>
 
 <script>
-  export default {
-    name: 'Logo',
-    props: {
-    },
-    data: function() {
-      return {
-      }
-    },
-    methods: {
-    },
-    computed: {
-    }
-  }
+  export default { name: 'Logo' }
 </script>
 
 
