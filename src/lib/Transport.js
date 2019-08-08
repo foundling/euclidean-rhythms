@@ -8,7 +8,7 @@ export default class Transport {
   }
 
   start() {
-    this.transport.start()
+    this.transport.start("+0.1")
   }
 
   pause() {

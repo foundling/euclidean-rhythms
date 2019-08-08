@@ -7,21 +7,23 @@
     height: 100%;
 
     circle {
-
       fill: white;
+
+      &:focus {
+        outline: none;
+      }
 
       &.active-step {
         fill: coral;
         stroke: yellow;
         stroke-width: 3;
       }
+
       &.editing {
         stroke: red;
         stroke-width: 3px;
       }
-      &.pulse.active-step {
-        fill: coral;
-      } 
+
       &.pulse.track-1 {
         fill: $track-1;
       }
@@ -38,20 +40,25 @@
         fill: $track-4;
       }
 
+      &.pulse.active-step {
+        fill: coral;
+      } 
+
+
       &.pulse {
         fill: aqua;
       }
+
       &.step {
         fill: black;
       }
+
       &.center {
         stroke: white;
         stroke-width: 3;
         fill: black;
       }
-
     }
-
   }
 </style>
 

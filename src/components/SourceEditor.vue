@@ -21,8 +21,6 @@
       .notes {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-column-gap: 10px;
-        grid-row-gap: 10px;
         margin: 10px 0px;
         padding: 0;
 
@@ -41,7 +39,13 @@
         .note {
           list-style-type: none;
           background: lightblue;
+          margin:5px;
           padding: 10px;
+
+          &.sharp {
+            padding-top: 0px;
+            background: black;
+          }
 
           &.octave-7 {
             background: scale-color($lightblue, $lightness: 0%);
@@ -67,7 +71,9 @@
           &.selected {
             background: salmon;
           }
-
+          &.sharp {
+            background: scale-color($lightblue, $lightness: 60%);
+          }
         }
         .note-name {
           text-align: center;
@@ -152,8 +158,9 @@
         @click="assignNote(note)"
         :title="note"
         :class="{
+          'sharp': note.includes('#'), 
           'selected': source.note === note,
-          ['octave-' + (parseInt(note.slice(-1)[0]) + 1)]: true
+          ['octave-' + (parseInt(note.slice(-1)[0]) + 1)]: true,
         }"
         class="note"></li>
       </ul>

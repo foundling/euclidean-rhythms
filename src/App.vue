@@ -45,6 +45,9 @@
     height: 400px;
 
     & > * { width: 100%; }
+    & *::selection {
+      background: transparent;
+    }
 
     @media(max-width: 500px) {
       width: 100%;
@@ -66,7 +69,6 @@
   import TrackSelector from './components/TrackSelector.vue'
   import Transport from './components/Transport.vue'
   import Logo from './components/Logo'
-
 
   export default {
     name: 'app',

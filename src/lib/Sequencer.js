@@ -1,7 +1,10 @@
 import Tone from 'tone'
+
 import { requiredParam, range } from './utils'
+
 import Synth from './Synth'
 import Transport from './Transport'
+
 
 const defaultSettings = {
   frequency: 'C7',
@@ -77,7 +80,7 @@ export default class Sequencer {
         }
       }
 
-    }, range(sequence.length), "8n").start(0.1)
+    }, range(sequence.length), "8n").start(0)
 
   }
 
