@@ -33,13 +33,18 @@ export default class Sequencer {
 
       // is this the right way to sync audio with UI?
       Tone.Draw.schedule(function() {
+
         // update ui using currently visibile track's ui
         const activeTrackDirection = self.tracks[self.trackIndex].direction 
         const trackStepIndex = activeTrackDirection === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
         self.ui.activeStep = trackStepIndex 
+
       }, time)
 
       for (let trackIndex = 0; trackIndex < self.tracks.length; trackIndex++) {
+
+        if (self.tracks[trackIndex].muted)
+          return
 
         const { sequence, stepData, direction } = self.tracks[trackIndex]
         const trackStepIndex = direction === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 

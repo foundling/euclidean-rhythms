@@ -12,6 +12,7 @@
     justify-content: space-around;
 
     .track  {
+      outline: none;
       border: none;
       box-sizing: border-box;
       height: 80px;
@@ -20,25 +21,15 @@
       color: white;
       border-radius: 2px;
 
-      &.active.track-1 {
+      &.track {
+        background: scale-color($track-1, $lightness: 80%);
+      }
+      &.active.track {
         background: $track-1;
       }
-      &.active.track-2 {
-        background: $track-2;
-      }
-      &.active.track-3 {
-        background: $track-3;
-      }
-      &.active.track-4 {
-        background: $track-4;
-      }
-      &.active {
-        color: gray;
-
-        &.muted {
-          background: red;
-          color: gray;
-        }
+      &.track.muted {
+        background: gray;
+        color: lightgray;
       }
 
     }

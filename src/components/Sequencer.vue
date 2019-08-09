@@ -24,20 +24,8 @@
         stroke-width: 3px;
       }
 
-      &.pulse.track-1 {
+      &.pulse.track {
         fill: $track-1;
-      }
-
-      &.pulse.track-2 {
-        fill: $track-2;
-      }
-
-      &.pulse.track-3 {
-        fill: $track-3;
-      }
-
-      &.pulse.track-4 {
-        fill: $track-4;
       }
 
       &.pulse.active-step {

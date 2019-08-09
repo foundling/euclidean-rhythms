@@ -1,27 +1,41 @@
 <template>
   <div class="sequencer-controls">
-    <button @click="incrementRotation">rotation: {{ rotation }}</button>
-    <i 
-    @click="reverseDirection('counter-clockwise')" 
+
+    <label>rotate</label>
+    <button class="fas fa-caret-left" @click="incrementRotation" />
+    <button class="fas fa-caret-right" @click="decrementRotation" />
+
+    <span> direction: </span>
+    <i @click="reverseDirection('counter-clockwise')" 
     :class="{
       'selected': direction === 'counter-clockwise',
       'fas fa-arrow-alt-circle-left': direction === 'counter-clockwise',
       'far fa-arrow-alt-circle-left': direction === 'clockwise'
-    }"/>
-    <i 
-    @click="reverseDirection('clockwise')" 
+    }"
+    class="reverse-direction" />
+
+    <i @click="reverseDirection('clockwise')" 
     :class="{
       'selected': direction === 'clockwise',
       'fas fa-arrow-alt-circle-right': direction === 'clockwise',
       'far fa-arrow-alt-circle-right': direction === 'counter-clockwise'
-    }"/>
+    }"
+    class="reverse-direction" />
+
+  <span> pulse increment: </span>
+  <select>
+    <option>random</option>
+    <option>+1</option>
+    <option>-1</option>
+  </select>
+
   </div>
 </template>
 
 <style lang="scss" scoped>
   .sequencer-controls {
-    color: lightgray;
-    .selected {
+    .reverse-direction {
+      color: lightgray;
     }
   }
 </style>

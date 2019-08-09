@@ -1,7 +1,6 @@
 sequencer:
   sequence direction:
     solo/mute channel
-    reverse seq direction
     manually add/subtract a pulse
     random pulse distribution
     per step/track octave buttons (that mutate underlying step data)
