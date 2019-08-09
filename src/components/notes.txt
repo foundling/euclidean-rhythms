@@ -1,0 +1,35 @@
+Features
+~~~~~~~~
+
+sequencer:
+  sequence direction:
+    manually add/subtract a pulse
+    random pulse distribution
+
+  note selector:
+    play note when we click on note selector 
+
+  ui:
+    replace transport/etc button default focus with something nicer 
+ 
+Todo
+~~~~
+
+  mute track when active track is clicked, unmute
+  offer a pre-existing list of pattern configs to choose from
+  manual
+  color coded guide. choose colors friendly to people w/ colorblindness.
+  rename source/tempo to two word names, per Vue best practices
+  fix ui color priorities so it's easier to use at first 
+  convert play controls to separate component, then nest that and Tempo inside of Transport, so you can
+  remove complexity in grandchild -> grandparent communication of tempo change. 
+
+Bugs
+~~~~
+
+- multiple tracks with rotation & reverse ends up skipping steps in active layer's UI? 
+  - no discernible playback problem.
+  - stopping and restarting sequence (no reload) resolves this.
+
+- bulk edit works for notes, but not for ADSR settings
+- if you rotate a sequence and then increment the 'k', the rotation is lost.

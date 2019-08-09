@@ -69,6 +69,10 @@
         border: none;
         background: transparent;
         padding: 10px;
+
+        &:focus {
+          outline: none;
+        }
       }
 
       button:first-child {
