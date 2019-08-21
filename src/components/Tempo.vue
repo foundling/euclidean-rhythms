@@ -1,7 +1,7 @@
 <template>
   <div class="tempo-control">
     <input 
-      @input="onTempoChange"
+      @change="onTempoChange"
       v-model.number="tempo$"
       class="tempo"
       type="number" 
