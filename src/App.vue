@@ -3,7 +3,9 @@
 
     <Logo />
 
-    <Transport :tempo="tempo" v-on:tempo-updated="updateTempo"/>
+    <Transport
+    :tempo="tempo"
+    v-on:tempo-updated="updateTempo"/>
 
     <SequencerControls 
     :direction="currentTrack.direction"
@@ -122,14 +124,20 @@
       reverseSequenceDirection(direction) {
         this.tracks[this.trackIndex].direction = direction
       },
-      rotateTrackSequence() {
-
-        // rotation should be negative if dir is 
-        this.tracks[this.trackIndex].rotation += 1
+      rotateTrackSequence(direction) {
 
         const { sequence, stepData } = this.tracks[this.trackIndex]
-        sequence.unshift(sequence.pop())
-        stepData.unshift(stepData.pop())
+
+        if (direction === 1) {
+          sequence.unshift(sequence.pop())
+          stepData.unshift(stepData.pop())
+        } else if (direction === -1) {
+          sequence.push(sequence.shift())
+          stepData.push(stepData.shift())
+        }
+
+        // rotation should be negative if dir is 
+        this.tracks[this.trackIndex].rotation = (this.tracks[this.trackIndex].rotation  + direction) % this.steps 
 
       },
       updateSelectedTrack(newTrackIndex) {

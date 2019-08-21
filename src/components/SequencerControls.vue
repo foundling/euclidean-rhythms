@@ -2,8 +2,8 @@
   <div class="sequencer-controls">
 
     <label>rotate</label>
-    <button class="fas fa-caret-left" @click="incrementRotation" />
-    <button class="fas fa-caret-right" @click="decrementRotation" />
+    <button class="fas fa-caret-left" @click="decrementRotation" />
+    <button class="fas fa-caret-right" @click="incrementRotation" />
 
     <span> direction: </span>
     <i @click="reverseDirection('counter-clockwise')" 
@@ -55,7 +55,10 @@
     },
     methods: {
       incrementRotation() {
-        this.$emit('sequencer-controls-rotated', this.rotation + 1)
+        this.$emit('sequencer-controls-rotated', +1)
+      },
+      decrementRotation() {
+        this.$emit('sequencer-controls-rotated', -1)
       },
       reverseDirection(direction) {
         if (direction !== this.direction)
