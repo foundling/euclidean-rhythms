@@ -58,8 +58,8 @@
     height="100%">
   
     <circle
-      @click="addPulse"
-      @keyup.enter="addPulse"
+      @click="updatePulseCount"
+      @keyup.enter="updatePulseCount"
       tabindex="1"
       class="center"
       cx="200"
@@ -94,6 +94,12 @@
   import Sequencer from '../lib/Sequencer'
   import Synth from '../lib/Synth'
 
+  const PULSE_MODES = {
+    '+1': (n, k) => (k + 1) % n,
+    '-1': (n, k) => (k <= 0) ? n : k - 1,
+    'random': (n, k) => Math.floor(Math.random() * n)
+  }
+
   export default {
     name: 'Sequencer',
     components: {},
@@ -102,8 +108,12 @@
         type: String,
         validator: dir => ['clockwise','counter-clockwise'].includes(dir)
       },
-      pulses: Number,
-      steps: Number,
+      //pulses: Number,
+      pulseMode: {
+        type: String,
+        validator: mode => Object.keys(PULSE_MODES).includes(mode)
+      },
+      //steps: Number,
       stepEditIndexes: Array,
       trackCount: Number,
       trackIndex: Number,
@@ -111,11 +121,7 @@
     },
     data: function() {
       return {
-        n: this.steps,
-        k: this.pulses,
-        ui: { 
-          activeStep: null 
-        }
+        ui: { activeStep: null }
       }
     },
     created() {
@@ -128,44 +134,37 @@
       this.sequencer.init()
     },
     methods: {
+      isEditable(index) {
+        // there may be stepEditIndexes values that aren't valid because
+        // they aren't on a pulse
+        return this.currentTrack.sequence[index] && this.stepEditIndexes.includes(index)
+      },
+      isActiveStep(stepIndex, activeStep) {
+        return stepIndex === activeStep
+      },
       updateSelectedTrack(newTrackIndex) {
         this.trackIndex = newTrackIndex
-      },
-      setSequences(n, k, sequenceCount) {
-        return range(sequenceCount).map(_ => ER(n, k))
-      },
-      setSequence(n, k) {
-        return ER(n, k)
       },
       setEditable(index, multiple=false) {
         // if multiple is true, take the last step edit index in the array that is also a pulse
         this.$emit('step-edit-index-updated', index, multiple)
-      },
-      isEditable(index) {
-        // there may be stepEditIndexes values that aren't valid because
-        // they aren't on a pulse
-        return this.tracks[this.trackIndex].sequence[index] && this.stepEditIndexes.includes(index)
-      },
-      isActiveStep(stepIndex, activeStep) {
-        return stepIndex === activeStep
       },
       calculateStepData(n, k, A) {
         return range(n).map((_, index) => {
           return A[index] ? Object.assign(Synth.defaultSettings, { sourceType: 'synth' }) : null
         })
       },
-      addPulse() {
+      updatePulseCount() {
         // increases k for this track
         // re-runs ER for n,k
 
-        const track = this.tracks[this.trackIndex] 
-        track.k = (track.k + 1 > track.n) ? 0 : track.k + 1
+        const track = this.currentTrack
+        const newPulseCount = PULSE_MODES[this.pulseMode](track.steps, track.pulses)
 
-        track.sequence = ER(track.n, track.k)
-        this.stepData = this.calculateStepData(track.n, track.k, track.sequence)
-
-        this.sequencer.updateSequence(this.trackIndex, track.sequence)
-
+        this.$emit('sequencer-track-pulse-count-updated', {
+          pulses: newPulseCount,
+          trackIndex: this.trackIndex
+        })
       },
       startSequence() {
         if (this.sequencer.state !== 'started')
@@ -180,40 +179,47 @@
           this.sequencer.pause()
       }
     },
+    computed: {
+      currentTrack() {
+        return this.tracks[this.trackIndex]
+      },
+      stepData() {
+        const { sequence, steps, pulses } = this.currentTrack
+        return this.calculateStepData(steps, pulses, sequence)
+      },
+      sequence() {
+        return ER(this.currentTrack.steps, this.currentTrack.pulses)
+      },
+      circles() {
+        const radius = 160
+        const offsetAngle = 90
+        const centerCoords = { x: 200, y: 200 }
+
+        // shouldn't this be on a track level? 
+        const radiansPerCircle = 360.0/this.currentTrack.steps
+        const activeSequence = this.sequence
+
+        return activeSequence.map((_, index) => radiansPerCircle * index)
+          .map((radians, index) => ({
+            isPulse: activeSequence[index],
+            cx: radius * Math.cos(degreesToRadians(radians - offsetAngle)) + centerCoords.x,
+            cy: radius * Math.sin(degreesToRadians(radians - offsetAngle)) + centerCoords.y
+          }))
+      },
+    },
     watch: {
       trackIndex(newIndex, oldIndex) {
         this.sequencer.trackIndex = newIndex
       },
       direction(newDirection, oldDirection) {
-        this.tracks[this.trackIndex]
         if (newDirection !== oldDirection) {
           this.sequencer.reverseDirection(newDirection)
         }
+      },
+      sequence(newSequence, oldSequence) {
+        this.sequencer.updateSequence(this.trackIndex, this.currentTrack.sequence)
       }
     },
-    computed: {
-      sequence() {
-        return this.tracks[this.trackIndex].sequence
-      },
-      circles() {
-
-        const radius = 160
-        const offsetAngle = 90
-        const centerCoords = { x: 200, y: 200 }
-        const radiansPerCircle = 360.0/this.n
-        const sequence = this.sequence
-
-        return sequence.map((_, index) => radiansPerCircle * index)
-          .map((radians, index) => ({
-            isPulse: sequence[index],
-            cx: radius * Math.cos(degreesToRadians(radians - offsetAngle)) + centerCoords.x,
-            cy: radius * Math.sin(degreesToRadians(radians - offsetAngle)) + centerCoords.y
-          }))
-
-      },
-      
-    }
   }
 
 </script>
-

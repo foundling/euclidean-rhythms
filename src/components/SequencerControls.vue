@@ -30,10 +30,10 @@
     class="reverse-direction" />
 
     <span>pulse increment: </span>
-    <select>
-      <option>+1</option>
-      <option>-1</option>
-      <option>random</option>
+    <select 
+    v-model="currentPulseMode"
+    @change="updatePulseMode(currentPulseMode)">
+      <option v-for="mode in pulseModes" :name="mode">{{ mode }}</option>
     </select>
 
   </div>
@@ -51,6 +51,10 @@
   export default {
     name: 'SequencerControls',
     props: {
+      pulseMode: {
+        type: String,
+        required: true
+      },
       rotation: {
         type: Number,
         required: true
@@ -64,7 +68,16 @@
         required: true
       }
     },
+    data() {
+      return {
+        currentPulseMode: '+1',
+        pulseModes: [ '+1', '-1', 'random' ]
+      }
+    },
     methods: {
+      updatePulseMode(newPulseMode) {
+        this.$emit('sequencer-controls-pulse-mode-updated', newPulseMode)
+      },
       updateStepCount(newStepCount) {
         this.$emit('sequencer-controls-update-step-count', newStepCount)
       },
@@ -81,5 +94,3 @@
     }
   }
 </script>
-
-

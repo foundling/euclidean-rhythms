@@ -1,13 +1,15 @@
 import Tone from 'tone'
 
+const noOp = () => {}
+
 export default class Transport {
 
   constructor({ 
 
     bpm = 120, 
-    onStart = () => {},
-    onPause = () => {}, 
-    onStop  = () => {} 
+    onStart = noOp,
+    onPause = noOp, 
+    onStop  = noOp
 
   }) {
 

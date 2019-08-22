@@ -1,3 +1,10 @@
+improvements:
+  implement sequence as a circular array with a rotation degree to avoid shifting elements.
+
+bugs:
+  
+  bulk update works for pitch, but not for envelope data
+
 sequencer:
   sequence direction:
     solo/mute channel

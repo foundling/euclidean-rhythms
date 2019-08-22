@@ -8,9 +8,11 @@
     v-on:tempo-updated="updateTempo"/>
 
     <SequencerControls 
-    :stepCount="steps"
+    :pulse-mode="pulseMode"
+    :step-count="steps"
     :direction="currentTrack.direction"
     :rotation="currentTrack.rotation % currentTrack.sequence.length"
+    v-on:sequencer-controls-pulse-mode-updated="updatePulseMode"
     v-on:sequencer-controls-rotated="rotateTrackSequence"
     v-on:sequencer-controls-update-step-count="updateStepCount"
     v-on:sequencer-controls-direction-changed="reverseSequenceDirection" />
@@ -19,9 +21,9 @@
     :track-count="trackCount"
     :tracks="tracks"
     :track-index="trackIndex"
-    :steps="steps"
-    :pulses="pulses" 
+    :pulse-mode="pulseMode"
     :step-edit-indexes="stepEditIndexes"
+    v-on:sequencer-track-pulse-count-updated="updatePulseCount"
     v-on:step-edit-index-updated="updateStepEditIndexes" />
 
     <TrackSelector 
@@ -93,13 +95,14 @@
     },
     data() {
       return {
-        tempo: 240,
         steps: 8,
         pulses: 0,
+        tempo: 240,
         trackCount: 4,
         tracks: null,
         trackIndex: 0,
-        stepEditIndexes: []
+        stepEditIndexes: [],
+        pulseMode: '+1'
       }
     },
     created() {
@@ -107,42 +110,48 @@
       this.tracks = this.initTracks(this.trackCount, this.steps, this.pulses)
     },
     methods: {
-      initTracks(trackCount, n, k) {
+      initTracks(trackCount, steps, pulses) {
         return range(trackCount).map(_ => {
           return {
-            n,
-            k,
+            steps,
+            pulses,
             rotation: 0,
             direction: 'clockwise',
             muted: false,
-            sequence: ER(n, k),
-            stepData: range(n).map(_ => Synth.defaultSettings),
+            sequence: ER(steps, pulses),
+            stepData: range(steps).map(_ => Synth.defaultSettings),
           }
         })
       },
       toggleTrackMute(trackIndex) {
-        this.tracks[trackIndex].muted = !this.tracks[trackIndex].muted
+        this.currentTrack.muted = !this.currentTrack.muted
       },
       reverseSequenceDirection(direction) {
-        this.tracks[this.trackIndex].direction = direction
+        this.currentTrack.direction = direction
+      },
+      updatePulseCount({ pulses, trackIndex }) {
+        this.currentTrack.pulses = pulses
+      },
+      updatePulseMode(newPulseMode) {
+        this.pulseMode = newPulseMode
       },
       updateStepCount(newStepCount) {
-        this.steps = newStepCount
+        this.currentTrack.steps = newStepCount
       },
-      rotateTrackSequence(direction) {
+      rotateTrackSequence(steps) {
 
-        const { sequence, stepData } = this.tracks[this.trackIndex]
+        const { sequence, stepData } = this.currentTrack
 
-        if (direction === 1) {
+        if (steps === 1) {
           sequence.unshift(sequence.pop())
           stepData.unshift(stepData.pop())
-        } else if (direction === -1) {
+        } else if (steps === -1) {
           sequence.push(sequence.shift())
           stepData.push(stepData.shift())
         }
 
         // rotation should be negative if dir is 
-        this.tracks[this.trackIndex].rotation = (this.tracks[this.trackIndex].rotation  + direction) % this.steps 
+        this.currentTrack.rotation = (this.currentTrack.rotation + steps) % this.currentTrack.steps 
 
       },
       updateSelectedTrack(newTrackIndex) {
@@ -150,7 +159,7 @@
       },
       updateStepEditIndexes(newEditIndex, multiple) {
 
-        const isPulse = Boolean(this.tracks[this.trackIndex].sequence[newEditIndex]) 
+        const isPulse = Boolean(this.currentTrack.sequence[newEditIndex]) 
         if (!isPulse)
           return
           
@@ -199,6 +208,12 @@
 
     },
     computed: {
+      sequences() {
+
+      },
+      currentTrack() {
+        return this.tracks[this.trackIndex]
+      },
       mutedTrackIndex() {
         return this.tracks.reduce((indexOfMutedTrack, track, index) => {
           if (indexOfMutedTrack !== null)
@@ -210,16 +225,13 @@
         }, null)
       },
       sourceEditorEnabled() {
-        const track = this.tracks[this.trackIndex]
+        const track = this.currentTrack
         return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
-      },
-      currentTrack() {
-        return this.tracks[this.trackIndex]
       },
       soundSource() {
         // if there are multiple stepEditIndexes, take the last one clicked 
         const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
-        return this.tracks[this.trackIndex].stepData[lastStepEditIndex] || Synth.defaultSettings
+        return this.currentTrack.stepData[lastStepEditIndex] || Synth.defaultSettings
       }
     }
   }
