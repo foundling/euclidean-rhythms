@@ -38,42 +38,40 @@
         }
         .note {
           list-style-type: none;
-          background: lightblue;
+          background: $track-1;
           margin:5px;
           padding: 10px;
 
-          &.sharp {
-            padding-top: 0px;
+          &.note.sharp {
+            background: scale-color($track-1, $lightness: 60%);
+          }
+          &.note.selected, &.note.pulse.selected {
+            background: $red;
           }
 
-          &.octave-7 {
-            background: scale-color($lightblue, $lightness: 0%);
-          }
-          &.octave-6 {
-            background: scale-color($lightblue, $lightness: 10%);
-          }
-          &.octave-5 {
-            background: scale-color($lightblue, $lightness: 20%);
-          }
-          &.octave-4 {
-            background: scale-color($lightblue, $lightness: 30%);
-          }
-          &.octave-3 {
-            background: scale-color($lightblue, $lightness: 40%);
-          }
-          &.octave-2 {
-            background: scale-color($lightblue, $lightness: 50%);
-          }
-          &.octave-1 {
-            background: scale-color($lightblue, $lightness: 60%);
-          }
-          &.selected {
-            background: salmon;
-          }
-          &.sharp {
-            background: scale-color($lightblue, $lightness: 60%);
-          }
         }
+        .note.octave-7 {
+          background: scale-color($track-1, $lightness: 0%);
+        }
+        .note.octave-6 {
+          background: scale-color($track-1, $lightness: 10%);
+        }
+        .note.octave-5 {
+          background: scale-color($track-1, $lightness: 10%);
+        }
+        .note.octave-4 {
+          background: scale-color($track-1, $lightness: 30%);
+        }
+        .note.octave-3 {
+          background: scale-color($track-1, $lightness: 30%);
+        }
+        .note.octave-2 {
+          background: scale-color($track-1, $lightness: 40%);
+        }
+        .note.octave-1 {
+          background: scale-color($track-1, $lightness: 40%);
+        }
+
         .note-name {
           text-align: center;
           list-style-type: none;
