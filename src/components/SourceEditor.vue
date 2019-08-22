@@ -44,7 +44,6 @@
 
           &.sharp {
             padding-top: 0px;
-            background: black;
           }
 
           &.octave-7 {

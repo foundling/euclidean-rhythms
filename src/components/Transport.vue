@@ -2,9 +2,9 @@
   <div class="transport">
 
     <div class="playhead-controls">
-      <button @click="start" class="fas fa-play" />
-      <button @click="stop" class="fas fa-stop" />
-      <button @click="pause" class="fas fa-pause" />
+      <button @click="start" :class="{ engaged: state === 'started' }" class="start-button fas fa-play" />
+      <button @click="stop"  :class="{ engaged: state === 'stopped' }" class="stop-button fas fa-stop" />
+      <button @click="pause" :class="{ engaged: state === 'paused'  }" class="pause-button fas fa-pause" />
     </div>
 
     <Tempo v-on:tempo-change="updateTempo" :tempo="tempo" />
@@ -28,8 +28,22 @@
     },
     data: function() {
       return {
-        transport: new Transport({ bpm: this.tempo })
+        state: null
       }
+    },
+    created() {
+
+      const self = this
+
+      function updateTransportState() { self.state = this.state }
+
+      this.transport = new Transport({ 
+        bpm: this.tempo,
+        onStart: updateTransportState,
+        onStop: updateTransportState,
+        onPause: updateTransportState,
+      })
+
     },
     methods: {
       updateTempo(newTempo) {
@@ -40,6 +54,7 @@
       },
       pause() {
         this.transport.pause()
+          console.log(this.transport.transport)
       },
       stop() {
         this.transport.stop()
@@ -57,6 +72,8 @@
 
 <style lang="scss" scoped>
 
+  @import '@/assets/scss/colors.scss';
+
   .transport {
     display: flex;
     align-items: center;
@@ -72,6 +89,10 @@
 
         &:focus {
           outline: none;
+        }
+
+        &.engaged {
+          color: $red;
         }
       }
 

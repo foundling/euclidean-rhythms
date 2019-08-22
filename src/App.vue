@@ -8,9 +8,11 @@
     v-on:tempo-updated="updateTempo"/>
 
     <SequencerControls 
+    :stepCount="steps"
     :direction="currentTrack.direction"
     :rotation="currentTrack.rotation % currentTrack.sequence.length"
     v-on:sequencer-controls-rotated="rotateTrackSequence"
+    v-on:sequencer-controls-update-step-count="updateStepCount"
     v-on:sequencer-controls-direction-changed="reverseSequenceDirection" />
 
     <Sequencer
@@ -124,6 +126,9 @@
       reverseSequenceDirection(direction) {
         this.tracks[this.trackIndex].direction = direction
       },
+      updateStepCount(newStepCount) {
+        this.steps = newStepCount
+      },
       rotateTrackSequence(direction) {
 
         const { sequence, stepData } = this.tracks[this.trackIndex]
@@ -182,11 +187,14 @@
         })
       },
       updateEnvelopeAtStep(envelopeData) {
-        // if there are multiple stepEditIndexes, take the last one clicked 
+
         if (!this.stepEditIndexes.length)
           return
+
+        // if there are multiple stepEditIndexes, take the last one clicked 
         const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
         this.tracks[this.trackIndex].stepData[lastStepEditIndex].envelope = envelopeData
+
       }
 
     },
