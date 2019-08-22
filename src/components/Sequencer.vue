@@ -7,20 +7,26 @@
     height: 100%;
 
     circle {
-      fill: white;
+      fill: scale-color($track-1, $lightness: 90%);
 
       &:focus {
         outline: none;
       }
 
-      &.active-step {
-        fill: coral;
-        stroke: yellow;
+      &.pulse.active-step {
+        fill: white;
+        stroke: scale-color($track-1, $lightness: 10%);
         stroke-width: 3;
+      } 
+
+      &.active-step {
+        stroke: $red;
+        stroke-width: 3;
+        stroke: scale-color($track-1, $lightness: 10%);
       }
 
       &.editing {
-        stroke: red;
+        stroke: $red;
         stroke-width: 3px;
       }
 
@@ -28,12 +34,8 @@
         fill: $track-1;
       }
 
-      &.pulse.active-step {
-        fill: coral;
-      } 
-
       &.pulse {
-        fill: aqua;
+        fill: $track-1;
       }
 
       &.step {
