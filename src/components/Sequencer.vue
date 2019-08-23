@@ -94,12 +94,6 @@
   import Sequencer from '../lib/Sequencer'
   import Synth from '../lib/Synth'
 
-  const PULSE_MODES = {
-    '+1': (n, k) => (k + 1) % n,
-    '-1': (n, k) => (k <= 0) ? n : k - 1,
-    'random': (n, k) => Math.floor(Math.random() * n)
-  }
-
   export default {
     name: 'Sequencer',
     components: {},
@@ -108,16 +102,13 @@
         type: String,
         validator: dir => ['clockwise','counter-clockwise'].includes(dir)
       },
-      //pulses: Number,
-      pulseMode: {
-        type: String,
-        validator: mode => Object.keys(PULSE_MODES).includes(mode)
-      },
       //steps: Number,
       stepEditIndexes: Array,
-      trackCount: Number,
       trackIndex: Number,
-      tracks: Array,
+      tracks: {
+        type: Array,
+        required: true
+      },
     },
     data: function() {
       return {
@@ -142,12 +133,12 @@
       isActiveStep(stepIndex, activeStep) {
         return stepIndex === activeStep
       },
-      updateSelectedTrack(newTrackIndex) {
-        this.trackIndex = newTrackIndex
-      },
       setEditable(index, multiple=false) {
         // if multiple is true, take the last step edit index in the array that is also a pulse
         this.$emit('step-edit-index-updated', index, multiple)
+      },
+      updateSelectedTrack(newTrackIndex) {
+        this.trackIndex = newTrackIndex
       },
       calculateStepData(n, k, A) {
         return range(n).map((_, index) => {
@@ -155,16 +146,15 @@
         })
       },
       updatePulseCount() {
-        // increases k for this track
-        // re-runs ER for n,k
 
-        const track = this.currentTrack
-        const newPulseCount = PULSE_MODES[this.pulseMode](track.steps, track.pulses)
+        const { steps, pulses } = this.currentTrack
+        const updateFn = PULSE_MODES[this.pulseMode] 
 
-        this.$emit('sequencer-track-pulse-count-updated', {
-          pulses: newPulseCount,
+        this.$emit('pulse-count-updated', {
+          pulses: updateFn(steps, pulses),
           trackIndex: this.trackIndex
         })
+
       },
       startSequence() {
         if (this.sequencer.state !== 'started')
@@ -186,9 +176,6 @@
       stepData() {
         const { sequence, steps, pulses } = this.currentTrack
         return this.calculateStepData(steps, pulses, sequence)
-      },
-      sequence() {
-        return ER(this.currentTrack.steps, this.currentTrack.pulses)
       },
       circles() {
         const radius = 160

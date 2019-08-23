@@ -3,12 +3,13 @@
 
     <Logo />
 
+    <!--
     <Transport
     :tempo="tempo"
     v-on:tempo-updated="updateTempo"/>
 
     <SequencerControls 
-    :pulse-mode="pulseMode"
+    :current-track="currentTrack"
     :step-count="steps"
     :direction="currentTrack.direction"
     :rotation="currentTrack.rotation % currentTrack.sequence.length"
@@ -16,16 +17,17 @@
     v-on:sequencer-controls-rotated="rotateTrackSequence"
     v-on:sequencer-controls-update-step-count="updateStepCount"
     v-on:sequencer-controls-direction-changed="reverseSequenceDirection" />
+    -->
 
     <Sequencer
-    :track-count="trackCount"
     :tracks="tracks"
     :track-index="trackIndex"
-    :pulse-mode="pulseMode"
     :step-edit-indexes="stepEditIndexes"
-    v-on:sequencer-track-pulse-count-updated="updatePulseCount"
+    v-on:sequencer-update="updateSequencer"
+    v-on:pulse-count-updated="updatePulseCount"
     v-on:step-edit-index-updated="updateStepEditIndexes" />
 
+    <!--
     <TrackSelector 
     :track-index="trackIndex"
     :track-count="trackCount" 
@@ -38,6 +40,7 @@
     :source="soundSource"
     v-on:source-editor-note-assign="updateNoteAtStep"
     v-on:source-editor-envelope-change="updateEnvelopeAtStep" />
+    -->
 
 
   </div>
@@ -83,6 +86,15 @@
   import Transport from './components/Transport.vue'
   import Logo from './components/Logo'
 
+  const TRACK_COUNT = 4
+  const STEP_COUNT = 8
+  const PULSE_COUNT = 0
+  const PULSE_MODES = {
+    '+1': (n, k) => (k + 1) % n,
+    '-1': (n, k) => (k <= 0) ? n : k - 1,
+    'random': (n, k) => Math.floor(Math.random() * n)
+  }
+
   export default {
     name: 'app',
     components: { 
@@ -95,19 +107,44 @@
     },
     data() {
       return {
-        steps: 8,
-        pulses: 0,
         tempo: 240,
         trackCount: 4,
-        tracks: null,
         trackIndex: 0,
+        tracks: this.initTracks(TRACK_COUNT, STEP_COUNT, PULSE_COUNT),
         stepEditIndexes: [],
-        pulseMode: '+1'
+        pulseMode: Object.keys(PULSE_MODES)[0]
       }
     },
     created() {
-      // remember to make these reactive.
-      this.tracks = this.initTracks(this.trackCount, this.steps, this.pulses)
+      // once the data is stored in local storage
+      // merge that data with this.tracks here
+    },
+    computed: {
+      sequences() {
+        return this.tracks.map(track => ER(track.steps, track.pulses))
+      },
+      currentTrack() {
+        return this.tracks[this.trackIndex]
+      },
+      mutedTrackIndex() {
+        return this.tracks.reduce((indexOfMutedTrack, track, index) => {
+          if (indexOfMutedTrack != null)
+            return indexOfMutedTrack
+          else if (track.muted)
+            return index
+          else
+            return null
+        }, null)
+      },
+      sourceEditorEnabled() {
+        const track = this.currentTrack
+        return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
+      },
+      soundSource() {
+        // if there are multiple stepEditIndexes, take the last one clicked 
+        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
+        return this.currentTrack.stepData[lastStepEditIndex] || Synth.defaultSettings
+      }
     },
     methods: {
       initTracks(trackCount, steps, pulses) {
@@ -117,6 +154,7 @@
             pulses,
             rotation: 0,
             direction: 'clockwise',
+            pulseMode: Object.keys(PULSE_MODE)[0],
             muted: false,
             sequence: ER(steps, pulses),
             stepData: range(steps).map(_ => Synth.defaultSettings),
@@ -130,7 +168,7 @@
         this.currentTrack.direction = direction
       },
       updatePulseCount({ pulses, trackIndex }) {
-        this.currentTrack.pulses = pulses
+        this.tracks[trackIndex].pulses = pulses
       },
       updatePulseMode(newPulseMode) {
         this.pulseMode = newPulseMode
@@ -206,33 +244,6 @@
 
       }
 
-    },
-    computed: {
-      sequences() {
-
-      },
-      currentTrack() {
-        return this.tracks[this.trackIndex]
-      },
-      mutedTrackIndex() {
-        return this.tracks.reduce((indexOfMutedTrack, track, index) => {
-          if (indexOfMutedTrack !== null)
-            return indexOfMutedTrack
-          else if (track.muted)
-            return index
-          else
-            return null
-        }, null)
-      },
-      sourceEditorEnabled() {
-        const track = this.currentTrack
-        return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
-      },
-      soundSource() {
-        // if there are multiple stepEditIndexes, take the last one clicked 
-        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
-        return this.currentTrack.stepData[lastStepEditIndex] || Synth.defaultSettings
-      }
     }
   }
 
