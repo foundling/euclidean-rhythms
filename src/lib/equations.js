@@ -38,4 +38,3 @@ export const initSequence = (n, k) => ([
   ...range(k).map(_ => '1'),
   ...range(n - k).map(_ => '0')
 ].join('').split(''))
-

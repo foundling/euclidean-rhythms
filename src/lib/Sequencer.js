@@ -3,6 +3,13 @@ import { requiredParam, range } from './utils'
 import Synth from './Synth'
 import Transport from './Transport'
 
+export const MAX_STEPS = 8
+export const TRACK_COUNT = 4
+export const PULSE_MODES = {
+  '+1': (n, k) => (k + 1) > n ? 0 : k + 1,
+  '-1': (n, k) => (k <= 0) ? n : k - 1,
+  'random': (n, k) => Math.floor(Math.random() * n)
+}
 
 export default class Sequencer {
 
@@ -19,6 +26,7 @@ export default class Sequencer {
     this.tracks = tracks
     this.ui = ui
 
+    return this
   }
 
   init() {
@@ -26,6 +34,7 @@ export default class Sequencer {
     const self = this
     const synths = range(self.tracks.length)
       .map(_ => new Tone.Synth(Synth.defaultSettings).toMaster())
+    const steps = this.tracks[0].steps
 
     self.sequencer = new Tone.Sequence(function(time, globalStepIndex) {
 
@@ -62,8 +71,9 @@ export default class Sequencer {
         }
       }
 
-    }, range(self.tracks[self.trackIndex].sequence.length), "8n").start(0)
+    }, range(steps), "8n").start(0)
 
+    return this
   }
 
   updateStep(newStepData, trackIndex, stepEditIndex) {

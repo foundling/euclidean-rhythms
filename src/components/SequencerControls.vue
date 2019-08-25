@@ -1,6 +1,8 @@
 <template>
   <div class="sequencer-controls">
 
+    <slot></slot>
+    <!--
     <label>steps:</label>
     <input
     type="number"
@@ -35,6 +37,7 @@
     @change="updatePulseMode(currentPulseMode)">
       <option v-for="mode in pulseModes" :name="mode">{{ mode }}</option>
     </select>
+    -->
 
   </div>
 </template>
@@ -51,22 +54,6 @@
   export default {
     name: 'SequencerControls',
     props: {
-      pulseMode: {
-        type: String,
-        required: true
-      },
-      rotation: {
-        type: Number,
-        required: true
-      },
-      direction: {
-        type: String,
-        default: 'clockwise'
-      },
-      stepCount: {
-        type: Number,
-        required: true
-      }
     },
     data() {
       return {
