@@ -11,8 +11,12 @@
 
   <div>
     <label>Rotation: {{ stepsRotated * rotationMagnitude }}</label>
-    <button class="fa fa-caret-left decrement" @click="updateRotation(-1)" />
-    <button class="fa fa-caret-right" @click="updateRotation(+1)" />
+    <button 
+    :class="{active: stepsRotated * rotationMagnitude < 0 }"
+    class="fa fa-caret-left decrement" @click="updateRotation(-1)" /> 
+    <button 
+    :class="{active: stepsRotated * rotationMagnitude > 0 }"
+    class="fa fa-caret-right" @click="updateRotation(+1)" />
   </div>
 
 </template>
