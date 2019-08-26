@@ -216,10 +216,12 @@
       updateStepCount(newStepCount) {
 
         /* means step counts can vary by track */
-        const sequence = this.tracks[activeChannel].sequence
-        if (sequence.n >= MAX_STEPS)
+        const sequence = this.tracks[this.activeChannel].sequence
+        if (newStepCount > MAX_STEPS)
           return
+
         sequence.n = newStepCount
+
       },
 
 

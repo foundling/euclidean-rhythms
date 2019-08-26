@@ -45,8 +45,12 @@ export default class Sequence {
     return this._n
   }
   set n(n) {
-    this._n = n
+    this._n = Math.max(n, 1)
+    this._k = Math.min(this._k, this._n)
     this._sequence = ERCache[this._n][this._k]
+
+    // adjust offset - to what? rotate(0) ?
+    this.rotate(0)
   }
 
   get k() {

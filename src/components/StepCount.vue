@@ -25,7 +25,7 @@
     },
     methods: {
       updateStepCount(steps) {
-        this.$emit('step-count-updated', stepCount + steps)
+        this.$emit('step-count-updated', this.stepCount + steps)
       }
     }
   }
