@@ -10,12 +10,9 @@
 <template>
 
   <div>
-
-    <label>Rotation: {{ stepsRotated }} </label>
-
-    <button class="decrement" @click="$emit('rotation-updated', -1)">-</button>
-    <button class="increment" @click="$emit('rotation-updated', +1)">+</button>
-
+    <label>Rotation: {{ stepsRotated * rotationMagnitude }}</label>
+    <button class="fa fa-caret-left decrement" @click="updateRotation(-1)" />
+    <button class="fa fa-caret-right" @click="updateRotation(+1)" />
   </div>
 
 </template>
@@ -25,7 +22,13 @@
   export default {
     name: 'Rotation',
     props: {
-      stepsRotated: Number
+      stepsRotated: Number,
+      rotationMagnitude: Number
+    },
+    methods: {
+      updateRotation(magnitude) {
+        this.$emit('rotation-updated', magnitude)
+      }
     }
   }
 

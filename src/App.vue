@@ -19,7 +19,8 @@
        v-on:pulse-mode-updated="updatePulseMode" />
 
       <Rotation
-       :steps-rotated="currentTrack.sequence.rotation" 
+       :steps-rotated="currentTrack.sequence.offset" 
+       :rotation-magnitude="currentTrack.sequence.offsetMagnitude"
        v-on:rotation-updated="updateTrackRotation" />
 
       <Direction

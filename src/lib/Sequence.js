@@ -33,6 +33,7 @@ export default class Sequence {
     this._n = n
     this._k = k
     this.offset = offset
+    this.offsetMagnitude = this.offset >= 0 ? 1 : -1
     this.direction = direction
     this.magnitude = this.direction === 'clockwise' ? 1 : -1
     this.muted = muted
@@ -45,12 +46,16 @@ export default class Sequence {
     return this._n
   }
   set n(n) {
+
+    // adjust k and offset so they're still in bounds of n.  
+
     this._n = Math.max(n, 1)
     this._k = Math.min(this._k, this._n)
     this._sequence = ERCache[this._n][this._k]
 
-    // adjust offset - to what? rotate(0) ?
+    // TODO: might need to set rotation to min(n - 1,offset)
     this.rotate(0)
+    console.log(this.offset)
   }
 
   get k() {
@@ -80,6 +85,9 @@ export default class Sequence {
     // note: +1 really rotates the sequence to the left, so flip sign of steps
     // so that +1 rotates to the right
 
+    //
+    this.offsetMagnitude = steps >= 0 ? 1 : -1
+ 
     steps = -1 * steps 
 
     // normalize negative offsets to positive offsets
