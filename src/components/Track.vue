@@ -1,49 +1,53 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors.scss";
 
-    circle {
-      fill: scale-color($track-1, $lightness: 90%);
+  circle {
+    fill: scale-color($track-1, $lightness: 90%);
 
-      &:focus {
-        outline: none;
-      }
-
-      &.pulse.active-step {
-        fill: white;
-        stroke: scale-color($track-1, $lightness: 10%);
-        stroke-width: 3;
-      } 
-
-      &.active-step {
-        stroke: $red;
-        stroke-width: 3;
-        stroke: scale-color($track-1, $lightness: 10%);
-      }
-
-      &.editing {
-        stroke: $red;
-        stroke-width: 3px;
-      }
-
-      &.pulse.track {
-        fill: $track-1;
-      }
-
-      &.pulse {
-        fill: $track-1;
-      }
-
-      &.step {
-        fill: black;
-      }
-
-      &.center {
-        stroke: white;
-        stroke-width: 3;
-        fill: black;
-      }
-
+    &:focus {
+      outline: none;
     }
+
+    &.pulse.active-step {
+      fill: white;
+      stroke: scale-color($track-1, $lightness: 10%);
+      stroke-width: 3;
+    } 
+
+    &.active-step {
+      stroke: $red;
+      stroke-width: 3;
+      stroke: scale-color($track-1, $lightness: 10%);
+    }
+
+    &.editing {
+      stroke: $red;
+      stroke-width: 3px;
+    }
+
+    &.pulse.track {
+      fill: $track-1;
+    }
+
+    &.pulse {
+      fill: $track-1;
+    }
+
+    &.step {
+      fill: black;
+    }
+
+    &.center {
+      stroke: white;
+      stroke-width: 3;
+      fill: black;
+    }
+
+    &.muted {
+      fill: $gray-dark;
+    }
+
+  }
 
 </style>
 
@@ -61,6 +65,7 @@
           'editing': isEditable(index),
           'active-step': isActiveStep(index, ui.activeStep),
           'pulse': circle.isPulse, 
+          'muted': track.sequence.muted 
         }"
         :cx="circle.cx"
         :cy="circle.cy"
