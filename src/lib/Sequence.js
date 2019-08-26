@@ -5,6 +5,7 @@ const MAX_N = 16
 const MIN_K = 0
 const MAX_K = 16
 
+
 const ERCache = []
 
 for (let n = MIN_N; n <= MAX_N; n++) {
@@ -43,49 +44,45 @@ export default class Sequence {
   get n() {
     return this._n
   }
-  set n(newN) {
-    this._n = newN
+  set n(n) {
+    this._n = n
     this._sequence = ERCache[this._n][this._k]
   }
 
   get k() {
     return this._k
   }
-  set k(newK) {
-    this._k = newK
+  set k(k) {
+    this._k = k
     this._sequence = ERCache[this._n][this._k]
   }
 
   get(index) {
 
-    /* return index at rotated sequence, checking bounds */
+    /* get sequence item post-rotation */
 
     if (index >= this.n || index < 0) {
       throw new Error('get(index) - array index out of bounds')
     }
     
     const { _n, _k, offset } = this
+    const rotatedIndex = (offset + index) % this.n
+    return this._sequence[rotatedIndex]
 
-    // so we can more easily calculate the get index post-offset
-    const safeIndex = this.positiveOffset % _n 
-    return this._sequence[safeIndex]
-
-  }
-
-  toPositiveOffset(offset, length) {
-    return offset < 0 ? length + offset : offset % length
-  }
-
-  get positiveOffset() {
-    return this.toPositiveOffset(this.offset, this._n)
   }
 
   rotate(steps) {
-    // +n = rotate clockwise
-    // -n = rotate counterclockwise
-    //
-    // todo: make sure this wraps appropriately
-    this.offset = this.toPositiveOffset(this.offset + steps, this._n)
+
+    // note: +1 really rotates the sequence to the left, so flip sign of steps
+    // so that +1 rotates to the right
+
+    steps = -1 * steps 
+
+    // normalize negative offsets to positive offsets
+    let offset = this.offset + steps
+    this.offset = offset < 0 ? this.n - 1
+                : offset >= this.n ? 0 
+                : offset
   }
 
 }
