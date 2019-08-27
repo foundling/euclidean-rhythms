@@ -27,17 +27,32 @@ export default class Sequence {
     direction = 'clockwise',
     stepData = [],
     muted = false,  
+    activeStep = -1
 
   }) {
   
     this._n = n
     this._k = k
+    this.activeStep = activeStep
     this.offset = offset
     this.offsetMagnitude = this.offset >= 0 ? 1 : -1
     this.direction = direction
     this.magnitude = this.direction === 'clockwise' ? 1 : -1
     this.muted = muted
     this._sequence = ERCache[this._n][this._k]
+
+  }
+
+  advance() {
+
+    this.activeStep = this.direction === 'clockwise' ? this.activeStep + 1 : this.activeStep - 1
+
+    if (this.activeStep >= this.n)
+      this.activeStep = 0
+    else if (this.activeStep < 0)
+      this.activeStep = this.n - 1
+
+    return this._sequence[this.activeStep]
 
   }
 
@@ -55,7 +70,6 @@ export default class Sequence {
 
     // TODO: might need to set rotation to min(n - 1,offset)
     this.rotate(0)
-    console.log(this.offset)
   }
 
   get k() {
@@ -75,6 +89,8 @@ export default class Sequence {
     }
     
     const { _n, _k, offset } = this
+    const normalizedOffset = (_n + offset) % _n
+    // convert to a positive index in bounds
     const rotatedIndex = (offset + index) % this.n
     return this._sequence[rotatedIndex]
 
@@ -82,19 +98,9 @@ export default class Sequence {
 
   rotate(steps) {
 
-    // note: +1 really rotates the sequence to the left, so flip sign of steps
-    // so that +1 rotates to the right
+    // offset is unsigned
+    this.offset = (steps + this.offset) % this.n
 
-    //
-    this.offsetMagnitude = steps >= 0 ? 1 : -1
- 
-    steps = -1 * steps 
-
-    // normalize negative offsets to positive offsets
-    let offset = this.offset + steps
-    this.offset = offset < 0 ? this.n - 1
-                : offset >= this.n ? 0 
-                : offset
   }
 
 }
