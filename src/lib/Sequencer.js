@@ -25,6 +25,7 @@ export default class Sequencer {
     this.tracks = tracks
 
     return this
+
   }
 
   init() {
@@ -38,12 +39,7 @@ export default class Sequencer {
       for (let trackIndex = 0; trackIndex < self.tracks.length; trackIndex++) {
 
         const { sequence, stepData } = self.tracks[trackIndex]
-
         const pulseAtStep = sequence.advance()
-
-        if (trackIndex === 0) {
-          console.log(`sequence 0. n: ${ sequence.n }, k: ${ sequence.k }, rotation: ${sequence.offset}`)
-        }
 
         if (!sequence.muted && pulseAtStep) {
 

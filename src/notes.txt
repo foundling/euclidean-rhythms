@@ -1,30 +1,14 @@
-bugs:
-  rotate and active step aren't in sync. might need to trigger sequencer.js update on rotate.
-
-improvements:
-  implement sequence as a circular array with a rotation degree to avoid shifting elements.
-
-
 sequencer:
-  sequence direction:
-    solo/mute channel
-    manually add/subtract a pulse
-    random pulse distribution
-    per step/track octave buttons (that mutate underlying step data)
 
-  bulk select/deselect:
+  separate stepEditIndexes per sequence
+  bulk select/deselect: IN PROGRESS
     shift click on a pulse in order to bulk edit. takes the target note, and copies all of the values for that step to the others.
 
   note selector:
     play note when we click on note selector 
-    give sharped notes different collor
 
 todo:
-  mute track when active track is clicked, unmute
   offer a pre-existing list of pattern configs to choose from
   manual
   color coded guide. choose colors friendly to people w/ colorblindness.
-  rename source/tempo to two word names, per Vue best practices
-  fix ui color priorities so it's easier to use at first 
-  convert play controls to separate component, then nest that and Tempo inside of Transport, so you can
-  remove complexity in grandchild -> grandparent communication of tempo change. 
+  rename all vue components to two-word names, per Vue best practices

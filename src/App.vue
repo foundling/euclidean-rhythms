@@ -5,23 +5,24 @@
 
     <Transport
     :tempo="tempo"
-    v-on:tempo-updated="updateTempo"/>
+    v-on:transport-stopped="resetActiveSteps"
+    v-on:transport-tempo-updated="updateTempo" />
 
     <SequencerControls :active-channel="activeChannel">
 
       <StepCount 
-       :step-count="currentTrack.sequence.n" 
-       v-on:step-count-updated="updateStepCount" />
+      :step-count="currentTrack.sequence.n" 
+      v-on:step-count-updated="updateStepCount" />
 
       <PulseMode 
-       pulse-mode="pulseMode" 
-       :pulse-modes="pulseModes" 
-       v-on:pulse-mode-updated="updatePulseMode" />
+      pulse-mode="pulseMode" 
+      :pulse-modes="pulseModes" 
+      v-on:pulse-mode-updated="updatePulseMode" />
 
       <Rotation
-       :steps-rotated="currentTrack.sequence.offset" 
-       :rotation-magnitude="currentTrack.sequence.offsetMagnitude"
-       v-on:rotation-updated="updateTrackRotation" />
+      :steps-rotated="currentTrack.sequence.offset" 
+      :rotation-magnitude="currentTrack.sequence.offsetMagnitude"
+      v-on:rotation-updated="updateTrackRotation" />
 
       <Direction
       :direction="currentTrack.sequence.direction"
@@ -33,6 +34,8 @@
     :tracks="tracks"
     :pulse-mode="pulseMode"
     :active-channel="activeChannel"
+    :step-edit-indexes="stepEditIndexes"
+    v-on:sequencer-step-edit-index-update="updateStepEditIndexes"
     v-on:pulse-count-updated="updatePulseCount" />
 
     <TrackSelector>
@@ -48,13 +51,11 @@
       </TrackButton>
     </TrackSelector>
 
-    <!--
     <SourceEditor 
     :enabled="sourceEditorEnabled" 
     :source="soundSource"
     v-on:source-editor-note-assign="updateNoteAtStep"
     v-on:source-editor-envelope-change="updateEnvelopeAtStep" />
-    -->
 
   </div>
 </template>
@@ -153,13 +154,12 @@
         }, null)
       },
       sourceEditorEnabled() {
-        const track = this.currentTrack
-        return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(i => track.sequence[i])
+        return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(index => this.currentTrack.sequence.get(index))
       },
       soundSource() {
         // if there are multiple stepEditIndexes, take the last one clicked 
         const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
-        return this.currentTrack.stepData[lastStepEditIndex] || Synth.defaultSettings
+        return this.currentTrack.sequence.getStepDataAt(lastStepEditIndex) || Synth.defaultSettings
       }
     },
     methods: {
@@ -167,8 +167,8 @@
         return range(trackCount).map((_, index) => {
           return {
             pulseMode: Object.keys(PULSE_MODES)[0],
-            stepData: range(steps).map(_ => Synth.defaultSettings), // NEED TO DEAL WITH THIS
             sequence: new Sequence({ 
+              stepData: range(steps).map(_ => Synth.defaultSettings),
               activeStep: -1,
               n: steps,
               k: pulses,
@@ -180,7 +180,6 @@
         })
       },
       updateTrackRotation(rotationSteps) {
-        console.log('rotated')
         this.tracks[this.activeChannel].sequence.rotate(rotationSteps)
       },
       updateTrackDirection(direction) {
@@ -193,6 +192,11 @@
       },
       updatePulseMode(newPulseMode) {
         this.pulseMode = newPulseMode
+      },
+      resetActiveSteps() {
+        this.tracks.forEach(t => {
+          t.sequence.activeStep = -1
+        })
       },
 
 
@@ -217,7 +221,7 @@
 
       updateStepEditIndexes(newEditIndex, multiple) {
 
-        const isPulse = Boolean(this.currentTrack.sequence[newEditIndex]) 
+        const isPulse = Boolean(this.currentTrack.sequence.get(newEditIndex)) 
         if (!isPulse)
           return
           
@@ -241,19 +245,44 @@
       // TODO: just use a single function to replace entire step data object
       //simpler 
 
-      updateNoteAtStep(newNote) {
+      updateNoteAtStep(newNoteName) {
 
-        // if there are multiple stepEditIndexes, take the last one clicked 
-        if (!this.stepEditIndexes.length)
-          return
 
-        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
-        const self = this
-        this.stepEditIndexes.forEach(i => {
-          if (self.tracks[this.activeChannel].sequence[i] === 1) { 
-            self.tracks[self.activeChannel].stepData[i].note = newNote
-          }
-        })
+        /* 
+           agenda:
+           if multiple: copy note data from last one to each previous note
+           otherwise: copy newNote to single index
+           copy by value, not reference! [x. for now we are just copying a note name string]
+
+           - ENSURE COPY WORKS (right now, a few cases where it doesn't)
+           - SYNC STEP EDIT INDEXES WITH SEQUENCE DATA ROTATION!
+
+
+        */
+
+        const tracks = this.tracks
+        const indexes = this.stepEditIndexes
+        const multiple = indexes.length > 1
+        const activeChannel = this.activeChannel
+
+        if (multiple) {
+          const mostRecent = indexes[indexes.length - 1]
+          indexes.slice(0, lastIndex).forEach(stepEditIndex => {
+            tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, newNoteName)
+          })
+        } else {
+          const [ stepEditIndex ] = indexes
+          tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, newNoteName)
+        }
+
+        // Clear out step edit indexes here?
+        // yes, but there is code to hide the source editor if no step edit indexes highlighted
+        // change that so that it always has a step highlighted
+
+        // remove all but the last step edit
+        this.stepEditIndexes = this.stepEditIndexes.slice(-1)
+
+
       },
       updateEnvelopeAtStep(envelopeData) {
 
@@ -262,7 +291,7 @@
 
         // if there are multiple stepEditIndexes, take the last one clicked 
         const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
-        this.tracks[this.activeChannel].stepData[lastStepEditIndex].envelope = envelopeData
+        this.tracks[this.activeChannel].sequence.stepData[lastStepEditIndex].envelope = envelopeData
 
       }
 

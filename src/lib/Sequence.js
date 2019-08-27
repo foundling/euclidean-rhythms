@@ -1,4 +1,5 @@
 import { ER } from '@/lib/equations'
+import { requiredParam } from '@/lib/utils'
 
 const MIN_N = 1
 const MAX_N = 16
@@ -24,7 +25,7 @@ export default class Sequence {
     k = pulses,
     offset = 0,
     direction = 'clockwise',
-    stepData = [],
+    stepData = requiredParam('stepData is a required param'),
     muted = false,  
     activeStep = -1
 
@@ -39,6 +40,7 @@ export default class Sequence {
     this.magnitude = this.direction === 'clockwise' ? 1 : -1
     this.muted = muted
     this._sequence = ERCache[this._n][this._k]
+    this.stepData = stepData
 
   }
 
@@ -79,9 +81,25 @@ export default class Sequence {
     this._sequence = ERCache[this._n][this._k]
   }
 
+  getStepDataAt(index) {
+    /* get stepData item post-rotation */
+    return this.stepData[this.getRotatedIndex(index)]
+  }
+
+  setStepDataAt(index, note) {
+    debugger
+    this.stepData[this.getRotatedIndex(index)].note = note
+    let test = 'a'
+  }
+
   get(index) {
 
     /* get sequence item post-rotation */
+    return this._sequence[this.getRotatedIndex(index)]
+
+  }
+
+  getRotatedIndex(index) {
 
     const { _n, _k, offset } = this
 
@@ -89,12 +107,12 @@ export default class Sequence {
     const rotatedIndex = offset < 0 ? (this._n - Math.abs(offset) + index) % this._n
                        : (offset + index) % this._n
 
-    return this._sequence[rotatedIndex]
-
+    return rotatedIndex
   }
 
   rotate(steps) {
     this.offset = (steps + this.offset) % this.n
+    console.log('rotation: ', this._sequence, this.stepData)
   }
 
 }

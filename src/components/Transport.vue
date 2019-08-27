@@ -49,16 +49,19 @@
     },
     methods: {
       updateTempo(newTempo) {
-        this.$emit('tempo-updated', newTempo)
+        this.$emit('transport-tempo-updated', newTempo)
       },
       start() {
         this.transport.start()
+        this.$emit('transport-started')
       },
       pause() {
         this.transport.pause()
+        this.$emit('transport-paused')
       },
       stop() {
         this.transport.stop()
+        this.$emit('transport-stopped')
       },
 
     },
