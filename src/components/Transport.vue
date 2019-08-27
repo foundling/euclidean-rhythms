@@ -44,6 +44,8 @@
         onPause: updateTransportState,
       })
 
+      this.state = this.transport.transport.state
+
     },
     methods: {
       updateTempo(newTempo) {
@@ -54,7 +56,6 @@
       },
       pause() {
         this.transport.pause()
-          console.log(this.transport.transport)
       },
       stop() {
         this.transport.stop()
