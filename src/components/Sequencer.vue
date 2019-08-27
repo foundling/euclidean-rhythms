@@ -58,15 +58,38 @@
     height="100%">
   
     <circle
-      @click="updatePulseCount"
-      @keyup.enter="updatePulseCount"
-      tabindex="1"
-      class="center"
-      cx="200"
-      cy="200"
+    @click="updatePulseCount"
+    @keyup.enter="updatePulseCount"
+    tabindex="1"
+    class="center"
+    cx="200"
+    cy="200"
+    r="20" />
+
+    <g 
+    v-for="(track, trackIndex) in tracks"
+    v-show="trackIndex === activeChannel" 
+    :key="trackIndex">
+
+      <circle 
+      v-for="(circle, index) in circles" 
+      @click.exact="setEditable(index)"
+      @click.shift.exact="setEditable(index, true)"
+      @keyup.enter="setEditable(index)"
+      :tabindex="index + 2"
+      :id="`step-${index}`"
+      :class="{ 
+        'editing': isEditable(index),
+        'active-step': index === track.sequence.activeStep,
+        'pulse': circle.isPulse, 
+        'muted': track.sequence.muted 
+      }"
+      :cx="circle.cx"
+      :cy="circle.cy"
+      :key="index"
       r="20" />
- 
-    <slot></slot>
+
+    </g>
 
   </svg>
 </template>
@@ -91,22 +114,18 @@
       activeChannel: Number
     },
     data: function() {
-      return {
-        ui: { activeStep: null }
-      }
+      return {}
     },
     created() {
-      // init sequencer here
-      /*
       this.sequencer = new Sequencer({
+        activeChannel: this.activeChannel,
         audioContext: new (window.AudioContext || AudioContext),
-        trackIndex: this.activeChannel,
         tracks: this.tracks,
-        ui: this.ui
       }).init()
-      */
     },
     methods: {
+      isEditable() {
+      },
       updatePulseCount() {
         this.$emit('pulse-count-updated', { 
           pulseMode: this.pulseMode,
@@ -115,6 +134,20 @@
       }
     },
     computed: {
+      circles() {
+        const radius = 160
+        const offsetAngle = 90
+        const centerCoords = { x: 200, y: 200 }
+        const { sequence } = this.tracks[this.activeChannel]
+        const radiansPerCircle = 360.0/sequence.n
+
+        return range(sequence.n).map(index => radiansPerCircle * index)
+          .map((radians, index) => ({
+            isPulse: sequence.get(index),
+            cx: radius * Math.cos(degreesToRadians(radians - offsetAngle)) + centerCoords.x,
+            cy: radius * Math.sin(degreesToRadians(radians - offsetAngle)) + centerCoords.y
+          }))
+      }
     },
     watch: {
     }

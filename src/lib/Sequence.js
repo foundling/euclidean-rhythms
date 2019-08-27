@@ -7,7 +7,6 @@ const MAX_K = 16
 
 
 const ERCache = []
-
 for (let n = MIN_N; n <= MAX_N; n++) {
 	for (let k = MIN_K; k <= n; k++) {
 		if (ERCache[n])
@@ -52,7 +51,7 @@ export default class Sequence {
     else if (this.activeStep < 0)
       this.activeStep = this.n - 1
 
-    return this._sequence[this.activeStep]
+    return this.get(this.activeStep)
 
   }
 
@@ -84,23 +83,18 @@ export default class Sequence {
 
     /* get sequence item post-rotation */
 
-    if (index >= this.n || index < 0) {
-      throw new Error('get(index) - array index out of bounds')
-    }
-    
     const { _n, _k, offset } = this
-    const normalizedOffset = (_n + offset) % _n
-    // convert to a positive index in bounds
-    const rotatedIndex = (offset + index) % this.n
+
+    // convert to a positive index for array access in bounds, accounting for offset
+    const rotatedIndex = offset < 0 ? (this._n - Math.abs(offset) + index) % this._n
+                       : (offset + index) % this._n
+
     return this._sequence[rotatedIndex]
 
   }
 
   rotate(steps) {
-
-    // offset is unsigned
     this.offset = (steps + this.offset) % this.n
-
   }
 
 }

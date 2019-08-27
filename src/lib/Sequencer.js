@@ -16,15 +16,13 @@ export default class Sequencer {
   constructor({ 
 
     tracks = requiredParam('tracks'),
-    trackIndex = requiredParam('trackIndex'),
-    ui = { activeStep: 0 },
+    activeChannel = requiredParam('activeChannel')
 
   }) {
 
     this.sequencer = null
-    this.trackIndex = trackIndex
+    this.activeChannel = activeChannel
     this.tracks = tracks
-    this.ui = ui
 
     return this
   }
@@ -34,46 +32,41 @@ export default class Sequencer {
     const self = this
     const synths = range(self.tracks.length)
       .map(_ => new Tone.Synth(Synth.defaultSettings).toMaster())
-    const steps = this.tracks[0].steps
 
     self.sequencer = new Tone.Sequence(function(time, globalStepIndex) {
 
-      const { sequence } = self.tracks[self.trackIndex]
-
-      // is this the right way to sync audio with UI?
-      Tone.Draw.schedule(function() {
-
-        // update ui using currently visibile track's ui
-        const activeTrackDirection = self.tracks[self.trackIndex].direction 
-        const trackStepIndex = activeTrackDirection === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
-        self.ui.activeStep = trackStepIndex 
-
-      }, time)
-
       for (let trackIndex = 0; trackIndex < self.tracks.length; trackIndex++) {
 
-        if (self.tracks[trackIndex].muted)
-          return
+        const { sequence, stepData } = self.tracks[trackIndex]
 
-        const { sequence, stepData, direction } = self.tracks[trackIndex]
-        const trackStepIndex = direction === 'clockwise' ? globalStepIndex : (sequence.length - globalStepIndex) % 8 
-        const pulseAtStep = Boolean(sequence[trackStepIndex])
+        const pulseAtStep = sequence.advance()
 
-        if (pulseAtStep) {
+        if (trackIndex === 0) {
+          console.log(`sequence 0. n: ${ sequence.n }, k: ${ sequence.k }, rotation: ${sequence.offset}`)
+        }
 
-          synths[trackIndex].envelope.attack = stepData[trackStepIndex].envelope.attack
-          synths[trackIndex].envelope.decay = stepData[trackStepIndex].envelope.decay
-          synths[trackIndex].envelope.sustain = stepData[trackStepIndex].envelope.sustain
-          synths[trackIndex].envelope.release = stepData[trackStepIndex].envelope.release
+        if (!sequence.muted && pulseAtStep) {
 
-          synths[trackIndex].triggerAttackRelease(stepData[trackStepIndex].note, '8n')
+          synths[trackIndex].envelope.attack = stepData[sequence.activeStep].envelope.attack
+          synths[trackIndex].envelope.decay = stepData[sequence.activeStep].envelope.decay
+          synths[trackIndex].envelope.sustain = stepData[sequence.activeStep].envelope.sustain
+          synths[trackIndex].envelope.release = stepData[sequence.activeStep].envelope.release
+
+          synths[trackIndex].triggerAttackRelease(stepData[sequence.activeStep].note, '8n')
 
         }
+
       }
 
-    }, range(steps), "8n").start(0)
+      // todo: sync ui with active step
+      Tone.Draw.schedule(function() {
+        const { sequence } = self.tracks[self.activeChannel]
+      }, time)
+
+    }, range(MAX_STEPS), "8n").start('+0.1')
 
     return this
+
   }
 
   updateStep(newStepData, trackIndex, stepEditIndex) {

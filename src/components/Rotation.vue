@@ -10,13 +10,14 @@
 <template>
 
   <div>
-    <label>Rotation: {{ stepsRotated * rotationMagnitude }}</label>
+    <!-- +1 moves sequence left, -1 moves it right.  user probably expects the reverse, so we're reversing steps rotated sign -->
+    <label>Rotation: {{ stepsRotated * -1 }}</label>
     <button 
-    :class="{active: stepsRotated * rotationMagnitude < 0 }"
-    class="fa fa-caret-left decrement" @click="updateRotation(-1)" /> 
+    :class='{ active: stepsRotated * -1 < 0}'
+    class="fa fa-caret-left decrement" @click="updateRotation(+1)" /> 
     <button 
-    :class="{active: stepsRotated * rotationMagnitude > 0 }"
-    class="fa fa-caret-right" @click="updateRotation(+1)" />
+    :class='{ active: stepsRotated * -1 > 0}'
+    class="fa fa-caret-right" @click="updateRotation(-1)" />
   </div>
 
 </template>

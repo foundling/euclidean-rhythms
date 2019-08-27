@@ -1,9 +1,9 @@
+bugs:
+  rotate and active step aren't in sync. might need to trigger sequencer.js update on rotate.
+
 improvements:
   implement sequence as a circular array with a rotation degree to avoid shifting elements.
 
-bugs:
-  
-  bulk update works for pitch, but not for envelope data
 
 sequencer:
   sequence direction:

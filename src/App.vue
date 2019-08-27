@@ -10,7 +10,7 @@
     <SequencerControls :active-channel="activeChannel">
 
       <StepCount 
-       :step-count="tracks[activeChannel].sequence.n" 
+       :step-count="currentTrack.sequence.n" 
        v-on:step-count-updated="updateStepCount" />
 
       <PulseMode 
@@ -33,18 +33,7 @@
     :tracks="tracks"
     :pulse-mode="pulseMode"
     :active-channel="activeChannel"
-    v-on:pulse-count-updated="updatePulseCount">
-
-      <!-- TODO: could track be implemented as  scoped slot? -->
-
-      <Track
-      v-for="(track, index) in tracks" 
-      v-show="activeChannel === index"
-      :sequence="track.sequence.data"
-      :muted="track.sequence.muted"
-      :track="track" /> 
-
-    </Sequencer>
+    v-on:pulse-count-updated="updatePulseCount" />
 
     <TrackSelector>
       <TrackButton 
@@ -115,7 +104,6 @@
   import TrackSelector from './components/TrackSelector'
   import TrackButton from './components/TrackButton'
   import Transport from './components/Transport'
-  import Track from './components/Track'
   import Logo from './components/Logo'
 
   export default {
@@ -129,14 +117,13 @@
       SequencerControls,
       SourceEditor,
       StepCount,
-      Track,
       TrackButton,
       TrackSelector,
       Transport, 
     },
     data() {
       return {
-        tempo: 240,
+        tempo: 100,
         trackCount: 4,
         activeChannel: 0,
         tracks: null,
@@ -182,6 +169,7 @@
             pulseMode: Object.keys(PULSE_MODES)[0],
             stepData: range(steps).map(_ => Synth.defaultSettings), // NEED TO DEAL WITH THIS
             sequence: new Sequence({ 
+              activeStep: -1,
               n: steps,
               k: pulses,
               direction: 'clockwise',
@@ -192,6 +180,7 @@
         })
       },
       updateTrackRotation(rotationSteps) {
+        console.log('rotated')
         this.tracks[this.activeChannel].sequence.rotate(rotationSteps)
       },
       updateTrackDirection(direction) {

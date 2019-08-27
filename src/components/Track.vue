@@ -53,27 +53,26 @@
 
 <template>
 
-    <g>
-      <circle 
-        v-for="(circle, index) in circles" 
-        @click.exact="setEditable(index)"
-        @click.shift.exact="setEditable(index, true)"
-        @keyup.enter="setEditable(index)"
-        :tabindex="index + 2"
-        :id="`step-${index}`"
-        :class="{ 
-          'editing': isEditable(index),
-          'active-step': isActiveStep(index, ui.activeStep),
-          'pulse': circle.isPulse, 
-          'muted': track.sequence.muted 
-        }"
-        :cx="circle.cx"
-        :cy="circle.cy"
-        :key="index"
-        r="20" /> 
-    </g>
+  <g>
+    <circle 
+      v-for="(circle, index) in circles" 
+      @click.exact="setEditable(index)"
+      @click.shift.exact="setEditable(index, true)"
+      @keyup.enter="setEditable(index)"
+      :tabindex="index + 2"
+      :id="`step-${index}`"
+      :class="{ 
+        'editing': isEditable(index),
+        'active-step': isActiveStep(index, ui.activeStep),
+        'pulse': circle.isPulse, 
+        'muted': track.sequence.muted 
+      }"
+      :cx="circle.cx"
+      :cy="circle.cy"
+      :key="index"
+      r="20" /> 
+  </g>
 
-  </svg>
 </template>
 
 <script>
