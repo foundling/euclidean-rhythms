@@ -38,17 +38,17 @@ export default class Sequencer {
 
       for (let trackIndex = 0; trackIndex < self.tracks.length; trackIndex++) {
 
-        const { sequence, stepData } = self.tracks[trackIndex]
+        const { sequence } = self.tracks[trackIndex]
         const pulseAtStep = sequence.advance()
 
         if (!sequence.muted && pulseAtStep) {
 
-          synths[trackIndex].envelope.attack = stepData[sequence.activeStep].envelope.attack
-          synths[trackIndex].envelope.decay = stepData[sequence.activeStep].envelope.decay
-          synths[trackIndex].envelope.sustain = stepData[sequence.activeStep].envelope.sustain
-          synths[trackIndex].envelope.release = stepData[sequence.activeStep].envelope.release
+          synths[trackIndex].envelope.attack = sequence.stepData[sequence.activeStep].envelope.attack
+          synths[trackIndex].envelope.decay = sequence.stepData[sequence.activeStep].envelope.decay
+          synths[trackIndex].envelope.sustain = sequence.stepData[sequence.activeStep].envelope.sustain
+          synths[trackIndex].envelope.release = sequence.stepData[sequence.activeStep].envelope.release
 
-          synths[trackIndex].triggerAttackRelease(stepData[sequence.activeStep].note, '8n')
+          synths[trackIndex].triggerAttackRelease(sequence.stepData[sequence.activeStep].note, '8n')
 
         }
 
@@ -66,7 +66,7 @@ export default class Sequencer {
   }
 
   updateStep(newStepData, trackIndex, stepEditIndex) {
-    this.tracks[trackIndex].stepData[stepEditIndex] = newStepData
+    this.tracks[trackIndex].sequence.stepData[stepEditIndex] = newStepData
   }
 
   updateSequence(trackIndex, newSequence) {

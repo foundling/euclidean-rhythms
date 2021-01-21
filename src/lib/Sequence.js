@@ -48,10 +48,11 @@ export default class Sequence {
 
     this.activeStep = this.direction === 'clockwise' ? this.activeStep + 1 : this.activeStep - 1
 
-    if (this.activeStep >= this.n)
+    if (this.activeStep >= this.n) {
       this.activeStep = 0
-    else if (this.activeStep < 0)
+    } else if (this.activeStep < 0) {
       this.activeStep = this.n - 1
+    }
 
     return this.get(this.activeStep)
 
@@ -87,7 +88,6 @@ export default class Sequence {
   }
 
   setStepDataAt(index, note) {
-    debugger
     this.stepData[this.getRotatedIndex(index)].note = note
     let test = 'a'
   }

@@ -164,6 +164,7 @@
     },
     methods: {
       initTracks(trackCount, steps, pulses) {
+        // does this need to be defined here? not vue-specific.
         return range(trackCount).map((_, index) => {
           return {
             pulseMode: Object.keys(PULSE_MODES)[0],
