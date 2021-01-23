@@ -29,3 +29,4 @@ export const requiredParam = (name) => {
   throw new TypeError(`${name} is a required parameter`)
 }
 
+export const jsonClone = obj => JSON.parse(JSON.stringify(obj))

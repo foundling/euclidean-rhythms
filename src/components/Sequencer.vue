@@ -105,7 +105,10 @@
     name: 'Sequencer',
     components: {},
     props: {
-      stepEditIndexes: Array,
+      stepsInEditMode: {
+        type: Array,
+        required: true
+      },
       tracks: {
         type: Array
       },
@@ -126,7 +129,8 @@
     },
     methods: {
       isEditable(index) {
-        return this.tracks[this.activeChannel].sequence.get(index) && this.stepEditIndexes.includes(index)
+        const validStep = Boolean(this.tracks[this.activeChannel].sequence.get(index))
+        return validStep && this.stepsInEditMode.includes(index)
       },
       setEditable(index, multiple=false) {
         this.$emit('sequencer-step-edit-index-update', index, multiple)

@@ -1,0 +1,2 @@
+finish converting stepEditIndexes from [] to {}, update methods.
+update multiple note copy fn to copy the note's entire data obj.

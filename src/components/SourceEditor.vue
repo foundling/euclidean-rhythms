@@ -195,10 +195,10 @@
         return note.replace(/[0-9]/,'') 
       },
       assignNote(note) {
-        this.$emit('source-editor-note-assign', note)
+        this.$emit('source-editor-note-assign', { param: 'note', value: note })
       },
       updateSourceEnvelope(envelopeSettings) {
-        this.$emit('source-editor-envelope-change', envelopeSettings)
+        this.$emit('source-editor-envelope-change',  { param: 'envelope', value: envelopeSettings })
       }
     },
     computed: {

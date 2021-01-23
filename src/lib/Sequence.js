@@ -87,9 +87,10 @@ export default class Sequence {
     return this.stepData[this.getRotatedIndex(index)]
   }
 
-  setStepDataAt(index, note) {
-    this.stepData[this.getRotatedIndex(index)].note = note
-    let test = 'a'
+  setStepDataAt(index, obj) {
+    debugger
+    const rotatedIndex = this.getRotatedIndex(index) 
+    this.stepData[rotatedIndex] = obj
   }
 
   get(index) {

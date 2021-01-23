@@ -34,7 +34,7 @@
     :tracks="tracks"
     :pulse-mode="pulseMode"
     :active-channel="activeChannel"
-    :step-edit-indexes="stepEditIndexes"
+    :steps-in-edit-mode="stepsInEditMode"
     v-on:sequencer-step-edit-index-update="updateStepEditIndexes"
     v-on:pulse-count-updated="updatePulseCount" />
 
@@ -54,8 +54,8 @@
     <SourceEditor 
     :enabled="sourceEditorEnabled" 
     :source="soundSource"
-    v-on:source-editor-note-assign="updateNoteAtStep"
-    v-on:source-editor-envelope-change="updateEnvelopeAtStep" />
+    v-on:source-editor-note-assign="updateStepData"
+    v-on:source-editor-envelope-change="updateStepData" />
 
   </div>
 </template>
@@ -89,7 +89,7 @@
 
 <script>
 
-  import { range } from './lib/utils'
+  import { range, jsonClone } from './lib/utils'
   import { ER } from './lib/equations'
   import Synth from './lib/Synth'
   import Sequence from './lib/Sequence'
@@ -128,7 +128,7 @@
         trackCount: 4,
         activeChannel: 0,
         tracks: null,
-        stepEditIndexes: [],
+        stepsInEditMode: [],
         pulseMode: Object.keys(PULSE_MODES)[0],
         pulseModes: PULSE_MODES,
       }
@@ -154,11 +154,12 @@
         }, null)
       },
       sourceEditorEnabled() {
-        return this.stepEditIndexes.length >= 0 && this.stepEditIndexes.some(index => this.currentTrack.sequence.get(index))
+        return this.stepsInEditMode.length >= 0 && this.stepsInEditMode.some(index => this.currentTrack.sequence.get(index))
       },
       soundSource() {
-        // if there are multiple stepEditIndexes, take the last one clicked 
-        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
+        // TODO: fix, not working with multiple
+        // if there are multiple stepsInEditMode, take the last one clicked 
+        const lastStepEditIndex = this.stepsInEditMode[this.stepsInEditMode.length - 1]
         return this.currentTrack.sequence.getStepDataAt(lastStepEditIndex) || Synth.defaultSettings
       }
     },
@@ -199,14 +200,11 @@
           t.sequence.activeStep = -1
         })
       },
-
-
-
-
       updatePulseCount({ pulseMode, activeChannel }) {
         const { n, k } = this.tracks[activeChannel].sequence
         const newK = PULSE_MODES[this.pulseMode](n, k)
         this.tracks[activeChannel].sequence.k = newK
+        this.stepsInEditMode.length = 0
       },
       updateStepCount(newStepCount) {
 
@@ -218,8 +216,6 @@
         sequence.n = newStepCount
 
       },
-
-
       updateStepEditIndexes(newEditIndex, multiple) {
 
         const isPulse = Boolean(this.currentTrack.sequence.get(newEditIndex)) 
@@ -227,14 +223,24 @@
           return
           
         if (multiple) {
-          // multiple selected, in which case we add this
-          this.stepEditIndexes.push(newEditIndex)
-        } else if (this.stepEditIndexes.includes(newEditIndex)) {
-          // toggling single edit from on -> off
-          this.stepEditIndexes = []
+          // multiple selected, including this step.  unselect them all.
+          if (this.stepsInEditMode.includes(newEditIndex)) {
+            this.stepsInEditMode = [] 
+          } else {
+            // multiple selected, but this is not yet selected, so we add it.
+            this.stepsInEditMode.push(newEditIndex)
+          }
         } else {
-          // or single toggled on
-          this.stepEditIndexes = [ newEditIndex ]
+          if (this.stepsInEditMode.length > 1) {
+            // toggle from previous multiple select to just a single step
+            this.stepsInEditMode = [newEditIndex]
+          } else if (this.stepsInEditMode.includes(newEditIndex)) {
+            // toggling single step edit view off
+            this.stepsInEditMode = [] 
+          } else {
+            // toggling single step edit view on
+            this.stepsInEditMode = [newEditIndex]
+          }
         }
 
       },
@@ -243,55 +249,45 @@
       },
 
 
-      // TODO: just use a single function to replace entire step data object
-      //simpler 
+      updateStepData({ param, value }) {
 
-      updateNoteAtStep(newNoteName) {
+        // TODO: additional updates before transitioning away from multiselect fail
 
+        const { activeChannel, tracks, stepsInEditMode } = this
+        const multipleNotesSelected = stepsInEditMode.length > 1
+        const lastStepEditIndex = stepsInEditMode[stepsInEditMode.length - 1]
 
-        /* 
-           agenda:
-           if multiple: copy note data from last one to each previous note
-           otherwise: copy newNote to single index
-           copy by value, not reference! [x. for now we are just copying a note name string]
+        if (multipleNotesSelected) {
 
-           - ENSURE COPY WORKS (right now, a few cases where it doesn't)
-           - SYNC STEP EDIT INDEXES WITH SEQUENCE DATA ROTATION!
+          // update selected step, then copy settings to other steps
+          const sourceStepData = tracks[activeChannel].sequence.stepData[lastStepEditIndex]
+          sourceStepData[param] = value
 
-
-        */
-
-        const tracks = this.tracks
-        const indexes = this.stepEditIndexes
-        const multiple = indexes.length > 1
-        const activeChannel = this.activeChannel
-
-        if (multiple) {
-          const mostRecent = indexes[indexes.length - 1]
-          indexes.slice(0, lastIndex).forEach(stepEditIndex => {
-            tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, newNoteName)
+          stepsInEditMode.forEach((stepEditIndex, index, array) => {
+            if (stepEditIndex === lastStepEditIndex) return
+            const clonedStep = jsonClone(sourceStepData)
+            tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, clonedStep)
           })
+
         } else {
-          const [ stepEditIndex ] = indexes
-          tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, newNoteName)
+          // FIXME: when doing a note change after a group value change, 
+          // the note value IS being changed but the UI isn't getting updated until next tick
+          // something about the multi-select and the update in the source editor ?
+
+          const [ index ] = stepsInEditMode
+          const sourceStepData = tracks[activeChannel].sequence.stepData[lastStepEditIndex]
+          sourceStepData[param] = value
+          tracks[activeChannel].sequence.setStepDataAt(index, sourceStepData)
         }
-
-        // Clear out step edit indexes here?
-        // yes, but there is code to hide the source editor if no step edit indexes highlighted
-        // change that so that it always has a step highlighted
-
-        // remove all but the last step edit
-        this.stepEditIndexes = this.stepEditIndexes.slice(-1)
-
 
       },
       updateEnvelopeAtStep(envelopeData) {
 
-        if (!this.stepEditIndexes.length)
+        if (!this.stepsInEditMode.length)
           return
 
-        // if there are multiple stepEditIndexes, take the last one clicked 
-        const lastStepEditIndex = this.stepEditIndexes[this.stepEditIndexes.length - 1]
+        // if there are multiple stepsInEditMode, take the last one clicked 
+        const lastStepEditIndex = this.stepsInEditMode[this.stepsInEditMode.length - 1]
         this.tracks[this.activeChannel].sequence.stepData[lastStepEditIndex].envelope = envelopeData
 
       }
