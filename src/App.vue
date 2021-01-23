@@ -54,8 +54,8 @@
     <SourceEditor 
     :enabled="sourceEditorEnabled" 
     :source="activeStepData"
-    v-on:source-editor-note-assign="updateStepData"
-    v-on:source-editor-envelope-change="updateStepData" />
+    v-on:source-editor-note-assign="updateNote"
+    v-on:source-editor-envelope-change="updateEnvelope" />
 
     {{ activeStepData }}
 
@@ -248,12 +248,19 @@
       },
 
 
+      updateEnvelope(newEnvParams) {
+        for (let i = 0; i < this.stepsInEditMode.length; i++) {
+          this.tracks[this.activeChannel].sequence.setEnvelopeAt(this.stepsInEditMode[i], newEnvParams) 
+        }
+      },
+
+      updateNote(newNote) {
+        for (let i = 0; i < this.stepsInEditMode.length; i++) {
+          this.tracks[this.activeChannel].sequence.setNoteAt(this.stepsInEditMode[i], newNote) 
+        }
+      },
+
       updateStepData({ param, value }) {
-
-
-        // bug's new iteration: after multi-click, only one of 3 works correctly. : [ 
-        // the problem is still only a UI update issue that after a group edit, single edits don't update immediately. 
-        // guesses: sequence data structure reactivity.  maybe clone sequence, make updates, and rebind sequence to cloned obj?
 
         const { activeChannel, tracks, stepsInEditMode } = this
         const multipleNotesSelected = stepsInEditMode.length > 1

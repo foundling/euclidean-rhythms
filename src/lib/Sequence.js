@@ -93,6 +93,25 @@ export default class Sequence {
     this.stepData[rotatedIndex] = obj
   }
 
+  getNoteAt(stepIndex) {
+    return this.stepData[this.getRotatedIndex(stepIndex)].note
+  }
+
+  setNoteAt(stepIndex, noteValue) {
+    const rotatedIndex = this.getRotatedIndex(stepIndex) 
+    this.stepData[rotatedIndex].note = noteValue
+  }
+
+  getEnvelopeAt(stepIndex) {
+    const rotatedIndex = this.getRotatedIndex(index) 
+    return this.stepData[rotatedIndex].envelope
+  }
+
+  setEnvelopeAt(stepIndex, newEnvelope) {
+    const rotatedIndex = this.getRotatedIndex(stepIndex) 
+    this.stepData[rotatedIndex].envelope = newEnvelope
+  }
+
   get(index) {
 
     /* get sequence item post-rotation */
