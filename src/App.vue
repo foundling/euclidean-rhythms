@@ -53,9 +53,11 @@
 
     <SourceEditor 
     :enabled="sourceEditorEnabled" 
-    :source="soundSource"
+    :source="activeStepData"
     v-on:source-editor-note-assign="updateStepData"
     v-on:source-editor-envelope-change="updateStepData" />
+
+    {{ activeStepData }}
 
   </div>
 </template>
@@ -134,10 +136,7 @@
       }
     },
     created() {
-      // once the data is stored in local storage
-      // merge that data with this.tracks here
       this.tracks = this.initTracks(TRACK_COUNT, MAX_STEPS, 0)
-
     },
     computed: {
       currentTrack() {
@@ -156,11 +155,11 @@
       sourceEditorEnabled() {
         return this.stepsInEditMode.length >= 0 && this.stepsInEditMode.some(index => this.currentTrack.sequence.get(index))
       },
-      soundSource() {
-        // TODO: fix, not working with multiple
-        // if there are multiple stepsInEditMode, take the last one clicked 
-        const lastStepEditIndex = this.stepsInEditMode[this.stepsInEditMode.length - 1]
-        return this.currentTrack.sequence.getStepDataAt(lastStepEditIndex) || Synth.defaultSettings
+      activeStepData() {
+        if (this.stepsInEditMode.length >= 0) {
+          const lastStepEditIndex = this.stepsInEditMode[this.stepsInEditMode.length - 1]
+          return this.currentTrack.sequence.getStepDataAt(lastStepEditIndex)
+        }
       }
     },
     methods: {
@@ -251,47 +250,28 @@
 
       updateStepData({ param, value }) {
 
-        // TODO: additional updates before transitioning away from multiselect fail
+
+        // bug's new iteration: after multi-click, only one of 3 works correctly. : [ 
+        // the problem is still only a UI update issue that after a group edit, single edits don't update immediately. 
+        // guesses: sequence data structure reactivity.  maybe clone sequence, make updates, and rebind sequence to cloned obj?
 
         const { activeChannel, tracks, stepsInEditMode } = this
         const multipleNotesSelected = stepsInEditMode.length > 1
         const lastStepEditIndex = stepsInEditMode[stepsInEditMode.length - 1]
+        const sourceStepData = tracks[activeChannel].sequence.stepData[lastStepEditIndex]
+        sourceStepData[param] = value
 
         if (multipleNotesSelected) {
-
-          // update selected step, then copy settings to other steps
-          const sourceStepData = tracks[activeChannel].sequence.stepData[lastStepEditIndex]
-          sourceStepData[param] = value
-
-          stepsInEditMode.forEach((stepEditIndex, index, array) => {
-            if (stepEditIndex === lastStepEditIndex) return
-            const clonedStep = jsonClone(sourceStepData)
-            tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, clonedStep)
-          })
+          for (let i = 0; i < stepsInEditMode.length - 1; i++ ) {
+            tracks[activeChannel].sequence.setStepDataAt(stepsInEditMode[i], jsonClone(sourceStepData))
+          }
 
         } else {
-          // FIXME: when doing a note change after a group value change, 
-          // the note value IS being changed but the UI isn't getting updated until next tick
-          // something about the multi-select and the update in the source editor ?
-
-          const [ index ] = stepsInEditMode
-          const sourceStepData = tracks[activeChannel].sequence.stepData[lastStepEditIndex]
-          sourceStepData[param] = value
-          tracks[activeChannel].sequence.setStepDataAt(index, sourceStepData)
+          const [ stepEditIndex ] = stepsInEditMode
+          tracks[activeChannel].sequence.setStepDataAt(stepEditIndex, jsonClone(sourceStepData))
         }
 
-      },
-      updateEnvelopeAtStep(envelopeData) {
-
-        if (!this.stepsInEditMode.length)
-          return
-
-        // if there are multiple stepsInEditMode, take the last one clicked 
-        const lastStepEditIndex = this.stepsInEditMode[this.stepsInEditMode.length - 1]
-        this.tracks[this.activeChannel].sequence.stepData[lastStepEditIndex].envelope = envelopeData
-
       }
-
 
     }
   }

@@ -40,7 +40,7 @@ export default class Sequence {
     this.magnitude = this.direction === 'clockwise' ? 1 : -1
     this.muted = muted
     this._sequence = ERCache[this._n][this._k]
-    this.stepData = stepData
+    this.stepData = stepData // TODO: convert to getter 
 
   }
 
@@ -77,6 +77,7 @@ export default class Sequence {
   get k() {
     return this._k
   }
+
   set k(k) {
     this._k = k
     this._sequence = ERCache[this._n][this._k]
@@ -88,7 +89,6 @@ export default class Sequence {
   }
 
   setStepDataAt(index, obj) {
-    debugger
     const rotatedIndex = this.getRotatedIndex(index) 
     this.stepData[rotatedIndex] = obj
   }
