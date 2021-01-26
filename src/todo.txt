@@ -1,6 +1,6 @@
-bugs:
+multiselect:
 
-finish converting stepEditIndexes from [] to {}, update methods.
-update multiple note copy fn to copy the note's entire data obj.
+- should be triggered by shift + click on a given step.  if another step is currently selected, treat that step as a range and select.
+- editIndexes need to be namespaced by track #  
 
 
