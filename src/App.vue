@@ -126,7 +126,7 @@
     },
     data() {
       return {
-        tempo: 100,
+        tempo: 120,
         trackCount: 4,
         activeChannel: 0,
         tracks: null,
