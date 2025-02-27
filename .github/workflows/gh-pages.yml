@@ -7,7 +7,7 @@ on:
     pull_request:
 
 jobs:
-  Github Pages Deploy:
+  Github-Pages-Deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
