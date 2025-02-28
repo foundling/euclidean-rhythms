@@ -17,5 +17,5 @@ jobs:
       - run: npm run build
       - run: git config --global user.email "alex@computer.com"
       - run: git config --global user.name "Alex"
-      - run: git add dist && git commit -m "adding dist."
-      - run: git subtree push --prefix dist origin gh-pages
+      - run: git add dist && git commit -m "updating dist."
+      - run: git subtree push --force --prefix dist origin gh-pages
