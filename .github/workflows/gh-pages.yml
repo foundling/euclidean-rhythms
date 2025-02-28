@@ -19,5 +19,6 @@ jobs:
       - run: git init
       - run: git add .
       - run: git config --global user.email "alex@computer.com"
+      - run: git config --global user.name "Alex"
       - run: git commit -am "deploy new version of euclidean rhythms synth"
       - run: git push --force origin gh-pages
