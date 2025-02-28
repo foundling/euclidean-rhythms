@@ -15,10 +15,8 @@ jobs:
           node-version: 14
       - run: npm install
       - run: npm run build
-      - run: cd dist
-      - run: git init
-      - run: git add .
       - run: git config --global user.email "alex@computer.com"
       - run: git config --global user.name "Alex"
-      - run: git commit -am "deploy new version of euclidean rhythms synth"
-      - run: git push --force origin gh-pages
+      - run: git subtree split --prefix dist -b gh-pages
+      - run: git push -f origin gh-pages:gh-pages
+      - run: git branch -D gh-pages
