@@ -1,7 +1,6 @@
 # Euclidean Rhythms
 
-A step sequencer based on Euler's Greatest Common Divisor algorithm.
-
+A step sequencer based on Euler's Greatest Common Divisor algorithm. Check it out: https://foundling.github.io/euclidean-rhythms/
 
 
 ## References
